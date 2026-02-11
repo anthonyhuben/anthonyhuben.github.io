@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const body = document.body;
 
-    // Check for saved dark mode preference
+    // Check for saved dark mode preference, default to enabled
     const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'enabled') {
+    if (darkMode !== 'disabled') {
         body.classList.add('dark-mode');
     }
 
