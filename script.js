@@ -4,6 +4,27 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Dark mode toggle ---
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    const body = document.body;
+
+    // Check for saved dark mode preference
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'enabled') {
+        body.classList.add('dark-mode');
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+
+        // Save preference
+        if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            localStorage.setItem('darkMode', null);
+        }
+    });
+
     // --- Navbar scroll effect ---
     const navbar = document.getElementById('navbar');
     const handleScroll = () => {
