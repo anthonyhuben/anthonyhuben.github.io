@@ -1,0 +1,3801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoFrameCompare - Advanced Frame Analysis Tool</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --surface-light: #2a2a2a;
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-color: #e0e0e0;
+            --text-muted: #9ca3af;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #059669;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+
+        .btn-accent:hover {
+            background-color: #d97706;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--surface-light);
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 5px;
+            background-color: var(--surface-color);
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mode-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .mode-tab:hover {
+            color: var(--text-color);
+            background-color: var(--surface-light);
+        }
+
+        .mode-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* View containers */
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        /* Single View */
+        .single-view.active {
+            display: block;
+        }
+
+        /* Comparison Container */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .frame-panel {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .frame-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .frame-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .frame-label .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .frame-a .badge {
+            background-color: var(--primary-color);
+        }
+
+        .frame-b .badge {
+            background-color: var(--secondary-color);
+        }
+
+        .frame-canvas-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .frame-canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .frame-info-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Common canvas container */
+        .canvas-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .canvas-container canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Swipe View */
+        .swipe-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            max-width: 1000px;
+            margin: 0 auto;
+            cursor: ew-resize;
+        }
+
+        .swipe-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .swipe-divider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+            cursor: ew-resize;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .swipe-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .swipe-divider::after {
+            content: '⟷';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #333;
+            z-index: 1;
+        }
+
+        .swipe-label {
+            position: absolute;
+            top: 10px;
+            padding: 5px 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 5;
+        }
+
+        .swipe-label.label-a {
+            left: 10px;
+        }
+
+        .swipe-label.label-b {
+            right: 10px;
+        }
+
+        /* Flicker View */
+        .flicker-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .flicker-indicator {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 6px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .flicker-indicator.frame-a {
+            background: var(--primary-color);
+        }
+
+        .flicker-indicator.frame-b {
+            background: var(--secondary-color);
+        }
+
+        /* Onion Skin View */
+        .onion-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .onion-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Blend modes for onion skin */
+        .blend-multiply { mix-blend-mode: multiply; }
+        .blend-screen { mix-blend-mode: screen; }
+        .blend-overlay { mix-blend-mode: overlay; }
+        .blend-difference { mix-blend-mode: difference; }
+        .blend-exclusion { mix-blend-mode: exclusion; }
+
+        /* Controls styling */
+        .view-controls {
+            max-width: 1000px;
+            margin: 15px auto 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .slider-container {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-container label {
+            white-space: nowrap;
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+
+        .slider-value {
+            font-family: monospace;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* Heatmap gradient */
+        .heatmap-gradient {
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(to right, #000080, #0000ff, #00ffff, #00ff00, #ffff00, #ff7f00, #ff0000);
+            border-radius: 4px;
+        }
+
+        /* Analysis Panel */
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .analysis-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .analysis-panel {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .analysis-panel h3 {
+            margin: 0 0 15px 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .region-grid {
+            display: grid;
+            gap: 2px;
+            background-color: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .region-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .region-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .region-cell .region-value {
+            background: rgba(0,0,0,0.6);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .stat-card {
+            background-color: var(--surface-color);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-card.high-change .stat-value {
+            color: var(--danger-color);
+        }
+
+        .stat-card.low-change .stat-value {
+            color: var(--secondary-color);
+        }
+
+        /* Histogram */
+        .histogram-container {
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            gap: 1px;
+            background-color: var(--surface-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .histogram-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
+            border-radius: 2px 2px 0 0;
+            min-width: 2px;
+            transition: height 0.3s;
+        }
+
+        .histogram-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* Color Histogram */
+        .color-histogram-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .channel-histogram {
+            background-color: var(--surface-color);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .channel-histogram h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .channel-histogram.red h4 { color: #ff6b6b; }
+        .channel-histogram.green h4 { color: #51cf66; }
+        .channel-histogram.blue h4 { color: #74c0fc; }
+
+        .channel-bars {
+            height: 60px;
+            display: flex;
+            align-items: flex-end;
+            gap: 0;
+        }
+
+        .channel-bar {
+            flex: 1;
+            min-width: 1px;
+        }
+
+        .channel-bar.red { background: #ff6b6b; }
+        .channel-bar.green { background: #51cf66; }
+        .channel-bar.blue { background: #74c0fc; }
+
+        /* Report Panel */
+        .report-panel {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .report-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .report-content {
+            background-color: var(--surface-color);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .region-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .region-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background-color: var(--surface-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .region-item:hover {
+            background-color: var(--surface-light);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .region-rank {
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 24px;
+        }
+
+        .region-name {
+            flex: 1;
+        }
+
+        .region-change {
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .region-change.high { color: var(--danger-color); }
+        .region-change.medium { color: var(--accent-color); }
+        .region-change.low { color: var(--secondary-color); }
+
+        /* Sequence Analysis View */
+        .sequence-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sequence-timeline {
+            display: flex;
+            gap: 2px;
+            height: 80px;
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-x: auto;
+            align-items: flex-end;
+        }
+
+        .sequence-frame {
+            min-width: 30px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .sequence-frame:hover {
+            opacity: 0.8;
+        }
+
+        .sequence-frame.selected {
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        /* Pixel Inspector */
+        .pixel-inspector {
+            position: fixed;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            min-width: 200px;
+        }
+
+        .pixel-inspector.visible {
+            display: block;
+        }
+
+        .pixel-preview {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pixel-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 2px solid #fff;
+        }
+
+        .pixel-info {
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .pixel-info div {
+            margin-bottom: 2px;
+        }
+
+        .pixel-diff {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Magnifier */
+        .magnifier-overlay {
+            position: absolute;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .magnifier-overlay.visible {
+            display: block;
+        }
+
+        .magnifier-canvas {
+            position: absolute;
+            image-rendering: pixelated;
+        }
+
+        /* Edge Detection */
+        .edge-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        /* RGB Channels View */
+        .rgb-channels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .rgb-channels-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .channel-panel {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .channel-panel h4 {
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .channel-panel.red h4 { color: #ff6b6b; }
+        .channel-panel.green h4 { color: #51cf66; }
+        .channel-panel.blue h4 { color: #74c0fc; }
+
+        .channel-canvas-container {
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .channel-canvas-container canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+            font-size: 1.1rem;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .video-placeholder svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.5;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .timeline-section {
+            margin-bottom: 20px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .frame-display {
+            font-family: monospace;
+            font-size: 1rem;
+            background-color: var(--surface-light);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .timeline-wrapper {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #4b5563;
+            border-radius: 4px;
+            outline: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .frame-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .frame-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 20px;
+            border-radius: 2px;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .frame-marker.marker-a {
+            background-color: var(--primary-color);
+        }
+
+        .frame-marker.marker-b {
+            background-color: var(--secondary-color);
+        }
+
+        .frame-marker.bookmark {
+            background-color: var(--accent-color);
+            height: 14px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background-color: #374151;
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: #4b5563;
+        }
+
+        .icon-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .icon-btn.active {
+            background-color: var(--primary-color);
+        }
+
+        select, .input-field {
+            background-color: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 70px;
+            text-align: center;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Frame Markers Panel */
+        .markers-panel {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .markers-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .markers-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .comparison-frames {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .comparison-frames {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .marker-card {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 4px solid;
+        }
+
+        .marker-card.frame-a {
+            border-left-color: var(--primary-color);
+        }
+
+        .marker-card.frame-b {
+            border-left-color: var(--secondary-color);
+        }
+
+        .marker-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .marker-card-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .marker-card-frame {
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .marker-card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Bookmarks List */
+        .bookmarks-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .bookmarks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bookmarks-header h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .bookmarks-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .bookmark-item {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bookmark-item:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .bookmark-frame {
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .bookmark-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px;
+            line-height: 1;
+            font-size: 1rem;
+        }
+
+        .bookmark-delete:hover {
+            color: var(--danger-color);
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Keyboard Shortcuts Help */
+        .shortcuts-panel {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 20px;
+        }
+
+        .shortcuts-panel h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        kbd {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--surface-light);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s;
+        }
+
+        /* Threshold controls */
+        .threshold-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--surface-color);
+            border-radius: 6px;
+        }
+
+        .threshold-slider {
+            flex: 1;
+        }
+
+        /* Tab sub-navigation */
+        .sub-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab {
+            padding: 6px 12px;
+            background-color: var(--surface-light);
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .sub-tab:hover {
+            color: var(--text-color);
+        }
+
+        .sub-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* SSIM indicator */
+        .ssim-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--surface-light);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .ssim-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .ssim-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .ssim-bar {
+            flex: 1;
+            height: 20px;
+            background: linear-gradient(to right, #ef4444, #f59e0b, #10b981);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .ssim-marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 30px;
+            background: white;
+            border-radius: 2px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Motion Vector Display */
+        .motion-vector-container {
+            position: relative;
+        }
+
+        .motion-arrows {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Zoom controls */
+        .zoom-level-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>🎬 Advanced Frame Analysis Tool</h1>
+        <div class="header-controls">
+            <div class="file-input-wrapper">
+                <button class="btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+                    </svg>
+                    Load Video
+                </button>
+                <input type="file" id="fileInput" accept="video/*">
+            </div>
+            <button class="btn btn-secondary" id="downloadFrameBtn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                Download Frame
+            </button>
+            <button class="btn btn-accent" id="exportComparisonBtn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                </svg>
+                Export View
+            </button>
+            <button class="btn btn-outline" id="exportReportBtn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+                    <path d="M8 12h8v2H8zm0 4h8v2H8z"/>
+                </svg>
+                Export Report
+            </button>
+        </div>
+    </header>
+
+    <!-- Mode Tabs -->
+    <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="single">📹 Single</button>
+        <button class="mode-tab" data-mode="compare">👁️ Side-by-Side</button>
+        <button class="mode-tab" data-mode="swipe">↔️ Swipe</button>
+        <button class="mode-tab" data-mode="overlay">🔲 Overlay</button>
+        <button class="mode-tab" data-mode="onion">🧅 Onion Skin</button>
+        <button class="mode-tab" data-mode="flicker">⚡ Flicker</button>
+        <button class="mode-tab" data-mode="difference">➖ Difference</button>
+        <button class="mode-tab" data-mode="heatmap">🔥 Heatmap</button>
+        <button class="mode-tab" data-mode="edge">🔲 Edge</button>
+        <button class="mode-tab" data-mode="rgb">🎨 RGB Channels</button>
+        <button class="mode-tab" data-mode="subtract">➗ Subtract</button>
+        <button class="mode-tab" data-mode="analysis">📊 Analysis</button>
+        <button class="mode-tab" data-mode="sequence">📈 Sequence</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Single View Mode -->
+        <div class="view-container active" id="singleView">
+            <div class="video-container" id="videoContainer">
+                <div class="video-placeholder" id="placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+                    </svg>
+                    <span>Load a video to begin</span>
+                </div>
+                <video id="video" playsinline style="display:none;"></video>
+            </div>
+        </div>
+
+        <!-- Side-by-Side Comparison Mode -->
+        <div class="view-container" id="compareView">
+            <div class="comparison-container">
+                <div class="frame-panel frame-a">
+                    <div class="frame-panel-header">
+                        <span class="frame-label"><span class="badge">A</span> Frame A</span>
+                        <button class="btn btn-small" id="setFrameABtn" disabled>Set Current</button>
+                    </div>
+                    <div class="frame-canvas-container">
+                        <canvas class="frame-canvas" id="canvasA"></canvas>
+                    </div>
+                    <div class="frame-info-bar">
+                        <span id="frameAInfo">Frame: --</span>
+                        <span id="frameATime">Time: --</span>
+                    </div>
+                </div>
+                <div class="frame-panel frame-b">
+                    <div class="frame-panel-header">
+                        <span class="frame-label"><span class="badge">B</span> Frame B</span>
+                        <button class="btn btn-small btn-secondary" id="setFrameBBtn" disabled>Set Current</button>
+                    </div>
+                    <div class="frame-canvas-container">
+                        <canvas class="frame-canvas" id="canvasB"></canvas>
+                    </div>
+                    <div class="frame-info-bar">
+                        <span id="frameBInfo">Frame: --</span>
+                        <span id="frameBTime">Time: --</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Swipe Comparison Mode -->
+        <div class="view-container" id="swipeView">
+            <div class="swipe-container" id="swipeContainer">
+                <canvas class="swipe-canvas" id="swipeCanvasA"></canvas>
+                <canvas class="swipe-canvas" id="swipeCanvasB" style="clip-path: inset(0 50% 0 0);"></canvas>
+                <div class="swipe-divider" id="swipeDivider" style="left: 50%;"></div>
+                <span class="swipe-label label-a">Frame A</span>
+                <span class="swipe-label label-b">Frame B</span>
+            </div>
+            <div class="view-controls">
+                <span class="text-muted">Drag the divider or click anywhere to compare</span>
+            </div>
+        </div>
+
+        <!-- Overlay Mode -->
+        <div class="view-container" id="overlayView">
+            <div class="canvas-container" id="overlayContainer">
+                <canvas id="overlayCanvasA"></canvas>
+                <canvas id="overlayCanvasB" style="position: absolute; top: 0; left: 0;"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Frame A</label>
+                    <input type="range" id="overlaySlider" min="0" max="100" value="50">
+                    <label>Frame B</label>
+                    <span class="slider-value"><span id="overlayValue">50</span>%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onion Skin Mode -->
+        <div class="view-container" id="onionView">
+            <div class="onion-container" id="onionContainer">
+                <canvas class="onion-canvas" id="onionCanvasA"></canvas>
+                <canvas class="onion-canvas" id="onionCanvasB"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Opacity</label>
+                    <input type="range" id="onionOpacitySlider" min="0" max="100" value="50">
+                    <span class="slider-value"><span id="onionOpacityValue">50</span>%</span>
+                </div>
+                <div class="control-group">
+                    <label>Blend Mode:</label>
+                    <select id="onionBlendMode">
+                        <option value="normal">Normal</option>
+                        <option value="multiply">Multiply</option>
+                        <option value="screen">Screen</option>
+                        <option value="overlay">Overlay</option>
+                        <option value="difference" selected>Difference</option>
+                        <option value="exclusion">Exclusion</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Frame A Tint:</label>
+                    <input type="color" id="onionTintA" value="#ff0000">
+                </div>
+                <div class="control-group">
+                    <label>Frame B Tint:</label>
+                    <input type="color" id="onionTintB" value="#00ff00">
+                </div>
+            </div>
+        </div>
+
+        <!-- Flicker Mode -->
+        <div class="view-container" id="flickerView">
+            <div class="canvas-container">
+                <canvas id="flickerCanvas"></canvas>
+            </div>
+            <div class="flicker-controls">
+                <div class="slider-container">
+                    <label>Speed (ms)</label>
+                    <input type="range" id="flickerSpeedSlider" min="50" max="2000" value="500">
+                    <span class="slider-value"><span id="flickerSpeedValue">500</span></span>
+                </div>
+                <button class="btn" id="flickerToggleBtn">⏸️ Pause</button>
+                <div class="flicker-indicator frame-a" id="flickerIndicator">Frame A</div>
+            </div>
+        </div>
+
+        <!-- Difference Mode -->
+        <div class="view-container" id="differenceView">
+            <div class="canvas-container">
+                <canvas id="differenceCanvas"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Sensitivity</label>
+                    <input type="range" id="diffThresholdSlider" min="1" max="100" value="30">
+                    <span class="slider-value"><span id="diffThresholdValue">30</span></span>
+                </div>
+                <div class="control-group">
+                    <label>Mode:</label>
+                    <select id="diffModeSelect">
+                        <option value="color">Color Difference</option>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="binary">Binary (Black/White)</option>
+                        <option value="amplified">Amplified</option>
+                    </select>
+                </div>
+            </div>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ff00;"></div>
+                    <span>Added in Frame B</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff0000;"></div>
+                    <span>Removed from Frame A</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #888;"></div>
+                    <span>Unchanged</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Heatmap Mode -->
+        <div class="view-container" id="heatmapView">
+            <div class="canvas-container">
+                <canvas id="heatmapCanvas"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Intensity</label>
+                    <input type="range" id="heatmapIntensitySlider" min="1" max="100" value="50">
+                    <span class="slider-value"><span id="heatmapIntensityValue">50</span></span>
+                </div>
+                <div class="control-group">
+                    <label>Color Map:</label>
+                    <select id="heatmapColorMap">
+                        <option value="thermal">Thermal</option>
+                        <option value="viridis">Viridis</option>
+                        <option value="plasma">Plasma</option>
+                        <option value="grayscale">Grayscale</option>
+                    </select>
+                </div>
+            </div>
+            <div class="legend">
+                <span>Low Change</span>
+                <div class="heatmap-gradient" id="heatmapGradient"></div>
+                <span>High Change</span>
+            </div>
+        </div>
+
+        <!-- Edge Detection Mode -->
+        <div class="view-container" id="edgeView">
+            <div class="canvas-container">
+                <canvas id="edgeCanvas"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Edge Threshold</label>
+                    <input type="range" id="edgeThresholdSlider" min="1" max="255" value="50">
+                    <span class="slider-value"><span id="edgeThresholdValue">50</span></span>
+                </div>
+                <div class="control-group">
+                    <label>Display:</label>
+                    <select id="edgeDisplayMode">
+                        <option value="combined">Combined Edges</option>
+                        <option value="frameA">Frame A Edges Only</option>
+                        <option value="frameB">Frame B Edges Only</option>
+                        <option value="difference">Edge Difference</option>
+                    </select>
+                </div>
+            </div>
+            <div class="edge-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3b82f6;"></div>
+                    <span>Frame A Edges</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span>Frame B Edges</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffffff;"></div>
+                    <span>Common Edges</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RGB Channels Mode -->
+        <div class="view-container" id="rgbView">
+            <div class="sub-tabs">
+                <button class="sub-tab active" data-rgb="difference">Channel Difference</button>
+                <button class="sub-tab" data-rgb="split">Split View</button>
+                <button class="sub-tab" data-rgb="histogram">Histogram Comparison</button>
+            </div>
+            <div id="rgbDifferenceView">
+                <div class="rgb-channels-grid">
+                    <div class="channel-panel red">
+                        <h4>🔴 Red Channel Difference</h4>
+                        <div class="channel-canvas-container">
+                            <canvas id="redDiffCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="channel-panel green">
+                        <h4>🟢 Green Channel Difference</h4>
+                        <div class="channel-canvas-container">
+                            <canvas id="greenDiffCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="channel-panel blue">
+                        <h4>🔵 Blue Channel Difference</h4>
+                        <div class="channel-canvas-container">
+                            <canvas id="blueDiffCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="rgbSplitView" style="display: none;">
+                <div class="comparison-container">
+                    <div class="frame-panel">
+                        <h4 style="margin: 0 0 10px 0;">Frame A Channels</h4>
+                        <div class="rgb-channels-grid">
+                            <div class="channel-panel red">
+                                <h4>Red</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="redChannelA"></canvas>
+                                </div>
+                            </div>
+                            <div class="channel-panel green">
+                                <h4>Green</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="greenChannelA"></canvas>
+                                </div>
+                            </div>
+                            <div class="channel-panel blue">
+                                <h4>Blue</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="blueChannelA"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="frame-panel">
+                        <h4 style="margin: 0 0 10px 0;">Frame B Channels</h4>
+                        <div class="rgb-channels-grid">
+                            <div class="channel-panel red">
+                                <h4>Red</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="redChannelB"></canvas>
+                                </div>
+                            </div>
+                            <div class="channel-panel green">
+                                <h4>Green</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="greenChannelB"></canvas>
+                                </div>
+                            </div>
+                            <div class="channel-panel blue">
+                                <h4>Blue</h4>
+                                <div class="channel-canvas-container">
+                                    <canvas id="blueChannelB"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="rgbHistogramView" style="display: none;">
+                <div class="comparison-container">
+                    <div class="frame-panel">
+                        <h4 style="margin: 0 0 10px 0;">Frame A Histogram</h4>
+                        <div class="color-histogram-container">
+                            <div class="channel-histogram red">
+                                <h4>Red</h4>
+                                <div class="channel-bars" id="histogramRedA"></div>
+                            </div>
+                            <div class="channel-histogram green">
+                                <h4>Green</h4>
+                                <div class="channel-bars" id="histogramGreenA"></div>
+                            </div>
+                            <div class="channel-histogram blue">
+                                <h4>Blue</h4>
+                                <div class="channel-bars" id="histogramBlueA"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="frame-panel">
+                        <h4 style="margin: 0 0 10px 0;">Frame B Histogram</h4>
+                        <div class="color-histogram-container">
+                            <div class="channel-histogram red">
+                                <h4>Red</h4>
+                                <div class="channel-bars" id="histogramRedB"></div>
+                            </div>
+                            <div class="channel-histogram green">
+                                <h4>Green</h4>
+                                <div class="channel-bars" id="histogramGreenB"></div>
+                            </div>
+                            <div class="channel-histogram blue">
+                                <h4>Blue</h4>
+                                <div class="channel-bars" id="histogramBlueB"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subtract Mode -->
+        <div class="view-container" id="subtractView">
+            <div class="canvas-container">
+                <canvas id="subtractCanvas"></canvas>
+            </div>
+            <div class="view-controls">
+                <div class="slider-container">
+                    <label>Amplification</label>
+                    <input type="range" id="subtractAmplifySlider" min="1" max="20" value="5">
+                    <span class="slider-value"><span id="subtractAmplifyValue">5</span>x</span>
+                </div>
+                <div class="control-group">
+                    <label>Mode:</label>
+                    <select id="subtractModeSelect">
+                        <option value="absolute">Absolute Difference</option>
+                        <option value="signed">Signed (A - B)</option>
+                        <option value="signedReverse">Signed (B - A)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="subtractNormalize"> Normalize
+                    </label>
+                </div>
+            </div>
+            <div class="ssim-display">
+                <div>
+                    <div class="ssim-value" id="ssimValue">--</div>
+                    <div class="ssim-label">Similarity Index</div>
+                </div>
+                <div class="ssim-bar">
+                    <div class="ssim-marker" id="ssimMarker" style="left: 0%;"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="ssim-value" id="psnrValue">--</div>
+                    <div class="ssim-label">PSNR (dB)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Mode -->
+        <div class="view-container" id="analysisView">
+            <div class="analysis-container">
+                <div class="analysis-panel">
+                    <h3>🗺️ Region Change Map</h3>
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" data-grid="4">4×4</button>
+                        <button class="sub-tab" data-grid="6">6×6</button>
+                        <button class="sub-tab" data-grid="8">8×8</button>
+                        <button class="sub-tab" data-grid="10">10×10</button>
+                    </div>
+                    <div class="region-grid" id="regionGrid"></div>
+                    <div class="histogram-container" id="changeHistogram"></div>
+                    <div class="histogram-labels">
+                        <span>0%</span>
+                        <span>Change Distribution</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="analysis-panel">
+                    <h3>📈 Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTotalChange">--</div>
+                            <div class="stat-label">Total Change %</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statPixelsChanged">--</div>
+                            <div class="stat-label">Pixels Changed</div>
+                        </div>
+                        <div class="stat-card high-change">
+                            <div class="stat-value" id="statMaxChange">--</div>
+                            <div class="stat-label">Max Region Change</div>
+                        </div>
+                        <div class="stat-card low-change">
+                            <div class="stat-value" id="statMinChange">--</div>
+                            <div class="stat-label">Min Region Change</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 20px;">📺 Most Changed Regions</h3>
+                    <div class="region-list" id="highChangeList"></div>
+                    
+                    <h3 style="margin-top: 15px;">📻 Least Changed Regions</h3>
+                    <div class="region-list" id="lowChangeList"></div>
+                </div>
+            </div>
+            
+            <!-- Detailed Report -->
+            <div class="report-panel">
+                <div class="report-header">
+                    <h3>📋 Detailed Analysis Report</h3>
+                    <div class="control-group">
+                        <button class="btn btn-small" id="generateReportBtn" disabled>Generate Report</button>
+                        <button class="btn btn-small btn-outline" id="copyReportBtn" disabled>Copy</button>
+                    </div>
+                </div>
+                <div class="report-content" id="reportContent">
+                    Set Frame A and Frame B, then click "Generate Report" to see detailed analysis.
+                </div>
+            </div>
+        </div>
+
+        <!-- Sequence Analysis Mode -->
+        <div class="view-container" id="sequenceView">
+            <div class="sequence-controls">
+                <div class="control-group">
+                    <label>Analyze from frame</label>
+                    <input type="number" id="seqStartFrame" class="input-field" value="0" min="0">
+                </div>
+                <div class="control-group">
+                    <label>to frame</label>
+                    <input type="number" id="seqEndFrame" class="input-field" value="30" min="1">
+                </div>
+                <div class="control-group">
+                    <label>Step</label>
+                    <input type="number" id="seqStep" class="input-field" value="1" min="1">
+                </div>
+                <button class="btn" id="analyzeSequenceBtn" disabled>Analyze Sequence</button>
+            </div>
+            
+            <div class="analysis-panel">
+                <h3>📊 Frame-to-Frame Change Timeline</h3>
+                <div class="sequence-timeline" id="sequenceTimeline">
+                    <div class="empty-state">Click "Analyze Sequence" to visualize frame changes</div>
+                </div>
+                <div class="progress-bar" id="sequenceProgress" style="display: none;">
+                    <div class="progress-fill" id="sequenceProgressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <div class="analysis-container" style="margin-top: 20px;">
+                <div class="analysis-panel">
+                    <h3>🎯 Motion Hotspots</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">Areas with most consistent change across frames</p>
+                    <div class="region-grid" id="motionHotspotGrid" style="margin-top: 10px;"></div>
+                </div>
+                <div class="analysis-panel">
+                    <h3>🧊 Static Areas</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">Areas with least change across frames</p>
+                    <div class="region-grid" id="staticAreaGrid" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+            
+            <div class="report-panel">
+                <div class="report-header">
+                    <h3>📈 Sequence Analysis Summary</h3>
+                </div>
+                <div class="report-content" id="sequenceReportContent">
+                    Analyze a sequence to see the summary here.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls Panel -->
+    <div class="controls-panel">
+        <div class="timeline-section">
+            <div class="timeline-header">
+                <span class="frame-display" id="currentFrameDisplay">Frame: 0 / 0</span>
+                <span class="frame-display" id="timeDisplay">00:00.000</span>
+            </div>
+            <div class="timeline-wrapper">
+                <div class="frame-markers" id="frameMarkers"></div>
+                <input type="range" id="frameSlider" min="0" max="0" step="1" value="0" disabled>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <!-- Playback Controls -->
+            <div class="control-group">
+                <button id="prevFrameBtn" class="icon-btn" disabled title="Previous Frame (←)">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button id="playPauseBtn" class="icon-btn" disabled title="Play/Pause (Space)">
+                    <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+                    <svg viewBox="0 0 24 24" id="pauseIcon" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button id="nextFrameBtn" class="icon-btn" disabled title="Next Frame (→)">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+
+            <!-- Frame Jump Controls -->
+            <div class="control-group">
+                <button id="jumpStartBtn" class="icon-btn" disabled title="Jump to Start (Home)">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/><rect x="4" y="6" width="2" height="12"/></svg>
+                </button>
+                <button id="jumpEndBtn" class="icon-btn" disabled title="Jump to End (End)">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/><rect x="18" y="6" width="2" height="12"/></svg>
+                </button>
+                <button id="jumpFrameABtn" class="icon-btn" disabled title="Jump to Frame A (1)">
+                    <svg viewBox="0 0 24 24"><text x="12" y="17" text-anchor="middle" font-size="14" font-weight="bold" fill="currentColor">A</text></svg>
+                </button>
+                <button id="jumpFrameBBtn" class="icon-btn" disabled title="Jump to Frame B (2)">
+                    <svg viewBox="0 0 24 24"><text x="12" y="17" text-anchor="middle" font-size="14" font-weight="bold" fill="currentColor">B</text></svg>
+                </button>
+            </div>
+
+            <!-- Bookmark Control -->
+            <div class="control-group">
+                <button id="addBookmarkBtn" class="icon-btn" disabled title="Add Bookmark (B)">
+                    <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                </button>
+            </div>
+
+            <!-- Settings -->
+            <div class="control-group">
+                <label for="fpsInput">FPS:</label>
+                <input type="number" id="fpsInput" class="input-field" value="30" min="1" max="144">
+            </div>
+
+            <div class="control-group">
+                <label for="speedSelect">Speed:</label>
+                <select id="speedSelect">
+                    <option value="1">1x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="0.25">0.25x</option>
+                    <option value="0.1">0.1x</option>
+                    <option value="0.05">0.05x</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="frameJumpInput">Jump:</label>
+                <input type="number" id="frameJumpInput" class="input-field" value="10" min="1" max="1000">
+                <button id="jumpBackBtn" class="icon-btn" disabled title="Jump Back (Shift+←)">
+                    <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+                </button>
+                <button id="jumpForwardBtn" class="icon-btn" disabled title="Jump Forward (Shift+→)">
+                    <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markers Panel -->
+    <div class="markers-panel">
+        <div class="markers-header">
+            <h3>📍 Frame Markers & Bookmarks</h3>
+            <button class="btn btn-small btn-outline" id="clearAllMarkersBtn">Clear All</button>
+        </div>
+
+        <div class="comparison-frames">
+            <div class="marker-card frame-a">
+                <div class="marker-card-header">
+                    <span class="marker-card-title">Frame A (Comparison)</span>
+                </div>
+                <div class="marker-card-frame" id="markerADisplay">Not Set</div>
+                <div class="marker-card-actions">
+                    <button class="btn btn-small" id="setMarkerABtn" disabled>Set Current</button>
+                    <button class="btn btn-small btn-outline" id="goToMarkerABtn" disabled>Go To</button>
+                    <button class="btn btn-small btn-outline" id="clearMarkerABtn" disabled>Clear</button>
+                </div>
+            </div>
+            <div class="marker-card frame-b">
+                <div class="marker-card-header">
+                    <span class="marker-card-title">Frame B (Comparison)</span>
+                </div>
+                <div class="marker-card-frame" id="markerBDisplay">Not Set</div>
+                <div class="marker-card-actions">
+                    <button class="btn btn-small btn-secondary" id="setMarkerBBtn" disabled>Set Current</button>
+                    <button class="btn btn-small btn-outline" id="goToMarkerBBtn" disabled>Go To</button>
+                    <button class="btn btn-small btn-outline" id="clearMarkerBBtn" disabled>Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bookmarks-section">
+            <div class="bookmarks-header">
+                <h4>📖 Bookmarks</h4>
+                <button class="btn btn-small btn-outline" id="clearBookmarksBtn">Clear All</button>
+            </div>
+            <div class="bookmarks-list" id="bookmarksList">
+                <div class="empty-state">No bookmarks yet. Press B to add one.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div class="shortcuts-panel">
+        <h4>⌨️ Keyboard Shortcuts</h4>
+        <div class="shortcuts-grid">
+            <div class="shortcut-item"><kbd>Space</kbd> Play/Pause</div>
+            <div class="shortcut-item"><kbd>←</kbd> Previous Frame</div>
+            <div class="shortcut-item"><kbd>→</kbd> Next Frame</div>
+            <div class="shortcut-item"><kbd>Shift+←</kbd> Jump Back</div>
+            <div class="shortcut-item"><kbd>Shift+→</kbd> Jump Forward</div>
+            <div class="shortcut-item"><kbd>Home</kbd> Go to Start</div>
+            <div class="shortcut-item"><kbd>End</kbd> Go to End</div>
+            <div class="shortcut-item"><kbd>A</kbd> Set Frame A</div>
+            <div class="shortcut-item"><kbd>S</kbd> Set Frame B</div>
+            <div class="shortcut-item"><kbd>1</kbd> Jump to Frame A</div>
+            <div class="shortcut-item"><kbd>2</kbd> Jump to Frame B</div>
+            <div class="shortcut-item"><kbd>B</kbd> Add Bookmark</div>
+            <div class="shortcut-item"><kbd>R</kbd> Generate Report</div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // ===== DOM Elements =====
+    const fileInput = document.getElementById('fileInput');
+    const video = document.getElementById('video');
+    const placeholder = document.getElementById('placeholder');
+    const frameSlider = document.getElementById('frameSlider');
+    const currentFrameDisplay = document.getElementById('currentFrameDisplay');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const prevFrameBtn = document.getElementById('prevFrameBtn');
+    const nextFrameBtn = document.getElementById('nextFrameBtn');
+    const speedSelect = document.getElementById('speedSelect');
+    const fpsInput = document.getElementById('fpsInput');
+    const downloadFrameBtn = document.getElementById('downloadFrameBtn');
+    const exportReportBtn = document.getElementById('exportReportBtn');
+    const exportComparisonBtn = document.getElementById('exportComparisonBtn');
+
+    // Jump controls
+    const jumpStartBtn = document.getElementById('jumpStartBtn');
+    const jumpEndBtn = document.getElementById('jumpEndBtn');
+    const jumpFrameABtn = document.getElementById('jumpFrameABtn');
+    const jumpFrameBBtn = document.getElementById('jumpFrameBBtn');
+    const jumpBackBtn = document.getElementById('jumpBackBtn');
+    const jumpForwardBtn = document.getElementById('jumpForwardBtn');
+    const frameJumpInput = document.getElementById('frameJumpInput');
+    const addBookmarkBtn = document.getElementById('addBookmarkBtn');
+
+    // Mode tabs and views
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    const viewContainers = document.querySelectorAll('.view-container');
+
+    // Comparison canvases
+    const canvasA = document.getElementById('canvasA');
+    const canvasB = document.getElementById('canvasB');
+    const ctxA = canvasA?.getContext('2d');
+    const ctxB = canvasB?.getContext('2d');
+
+    // Swipe canvases
+    const swipeCanvasA = document.getElementById('swipeCanvasA');
+    const swipeCanvasB = document.getElementById('swipeCanvasB');
+    const swipeContainer = document.getElementById('swipeContainer');
+    const swipeDivider = document.getElementById('swipeDivider');
+
+    // Overlay canvases
+    const overlayCanvasA = document.getElementById('overlayCanvasA');
+    const overlayCanvasB = document.getElementById('overlayCanvasB');
+    const overlaySlider = document.getElementById('overlaySlider');
+    const overlayValue = document.getElementById('overlayValue');
+
+    // Onion skin
+    const onionCanvasA = document.getElementById('onionCanvasA');
+    const onionCanvasB = document.getElementById('onionCanvasB');
+    const onionOpacitySlider = document.getElementById('onionOpacitySlider');
+    const onionOpacityValue = document.getElementById('onionOpacityValue');
+    const onionBlendMode = document.getElementById('onionBlendMode');
+
+    // Flicker
+    const flickerCanvas = document.getElementById('flickerCanvas');
+    const flickerSpeedSlider = document.getElementById('flickerSpeedSlider');
+    const flickerSpeedValue = document.getElementById('flickerSpeedValue');
+    const flickerToggleBtn = document.getElementById('flickerToggleBtn');
+    const flickerIndicator = document.getElementById('flickerIndicator');
+
+    // Difference
+    const differenceCanvas = document.getElementById('differenceCanvas');
+    const diffThresholdSlider = document.getElementById('diffThresholdSlider');
+    const diffThresholdValue = document.getElementById('diffThresholdValue');
+    const diffModeSelect = document.getElementById('diffModeSelect');
+
+    // Heatmap
+    const heatmapCanvas = document.getElementById('heatmapCanvas');
+    const heatmapIntensitySlider = document.getElementById('heatmapIntensitySlider');
+    const heatmapIntensityValue = document.getElementById('heatmapIntensityValue');
+
+    // Edge detection
+    const edgeCanvas = document.getElementById('edgeCanvas');
+    const edgeThresholdSlider = document.getElementById('edgeThresholdSlider');
+    const edgeThresholdValue = document.getElementById('edgeThresholdValue');
+    const edgeDisplayMode = document.getElementById('edgeDisplayMode');
+
+    // RGB channels
+    const redDiffCanvas = document.getElementById('redDiffCanvas');
+    const greenDiffCanvas = document.getElementById('greenDiffCanvas');
+    const blueDiffCanvas = document.getElementById('blueDiffCanvas');
+
+    // Subtract
+    const subtractCanvas = document.getElementById('subtractCanvas');
+    const subtractAmplifySlider = document.getElementById('subtractAmplifySlider');
+    const subtractAmplifyValue = document.getElementById('subtractAmplifyValue');
+    const subtractModeSelect = document.getElementById('subtractModeSelect');
+    const ssimValue = document.getElementById('ssimValue');
+    const psnrValue = document.getElementById('psnrValue');
+
+    // Analysis elements
+    const regionGrid = document.getElementById('regionGrid');
+    const changeHistogram = document.getElementById('changeHistogram');
+    const highChangeList = document.getElementById('highChangeList');
+    const lowChangeList = document.getElementById('lowChangeList');
+    const reportContent = document.getElementById('reportContent');
+    const generateReportBtn = document.getElementById('generateReportBtn');
+    const copyReportBtn = document.getElementById('copyReportBtn');
+
+    // Sequence elements
+    const seqStartFrame = document.getElementById('seqStartFrame');
+    const seqEndFrame = document.getElementById('seqEndFrame');
+    const seqStep = document.getElementById('seqStep');
+    const analyzeSequenceBtn = document.getElementById('analyzeSequenceBtn');
+    const sequenceTimeline = document.getElementById('sequenceTimeline');
+    const sequenceProgress = document.getElementById('sequenceProgress');
+    const sequenceProgressFill = document.getElementById('sequenceProgressFill');
+    const motionHotspotGrid = document.getElementById('motionHotspotGrid');
+    const staticAreaGrid = document.getElementById('staticAreaGrid');
+    const sequenceReportContent = document.getElementById('sequenceReportContent');
+
+    // Marker controls
+    const setFrameABtn = document.getElementById('setFrameABtn');
+    const setFrameBBtn = document.getElementById('setFrameBBtn');
+    const setMarkerABtn = document.getElementById('setMarkerABtn');
+    const setMarkerBBtn = document.getElementById('setMarkerBBtn');
+    const goToMarkerABtn = document.getElementById('goToMarkerABtn');
+    const goToMarkerBBtn = document.getElementById('goToMarkerBBtn');
+    const clearMarkerABtn = document.getElementById('clearMarkerABtn');
+    const clearMarkerBBtn = document.getElementById('clearMarkerBBtn');
+    const markerADisplay = document.getElementById('markerADisplay');
+    const markerBDisplay = document.getElementById('markerBDisplay');
+    const frameMarkers = document.getElementById('frameMarkers');
+    const bookmarksList = document.getElementById('bookmarksList');
+    const clearBookmarksBtn = document.getElementById('clearBookmarksBtn');
+    const clearAllMarkersBtn = document.getElementById('clearAllMarkersBtn');
+    const frameAInfo = document.getElementById('frameAInfo');
+    const frameBInfo = document.getElementById('frameBInfo');
+    const frameATime = document.getElementById('frameATime');
+    const frameBTime = document.getElementById('frameBTime');
+
+    const toast = document.getElementById('toast');
+
+    // ===== State =====
+    let fps = 30;
+    let totalFrames = 0;
+    let isVideoLoaded = false;
+    let isSeeking = false;
+    let currentMode = 'single';
+    let gridSize = 4;
+
+    let frameA = null;
+    let frameB = null;
+    let frameAImageData = null;
+    let frameBImageData = null;
+    let bookmarks = [];
+    let regionAnalysisData = [];
+    let sequenceAnalysisData = [];
+    let flickerInterval = null;
+    let flickerState = true;
+
+    // ===== Initialization =====
+    function init() {
+        fps = parseFloat(fpsInput.value);
+        updateControlsState();
+        setupSubTabs();
+        setupEventListeners();
+    }
+
+    function setupSubTabs() {
+        document.querySelectorAll('.sub-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const parent = tab.parentElement;
+                parent.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (tab.dataset.grid) {
+                    gridSize = parseInt(tab.dataset.grid);
+                    if (frameAImageData && frameBImageData) {
+                        performRegionAnalysis();
+                    }
+                } else if (tab.dataset.rgb) {
+                    handleRGBSubTab(tab.dataset.rgb);
+                }
+            });
+        });
+    }
+
+    function setupEventListeners() {
+        // Swipe divider
+        if (swipeContainer && swipeDivider) {
+            let isDragging = false;
+            swipeContainer.addEventListener('mousedown', startSwipe);
+            document.addEventListener('mousemove', doSwipe);
+            document.addEventListener('mouseup', stopSwipe);
+            swipeContainer.addEventListener('click', (e) => {
+                if (!isDragging) {
+                    const rect = swipeContainer.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const percent = (x / rect.width) * 100;
+                    updateSwipeDivider(percent);
+                }
+            });
+
+            function startSwipe(e) {
+                isDragging = true;
+            }
+
+            function doSwipe(e) {
+                if (!isDragging) return;
+                const rect = swipeContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                updateSwipeDivider(percent);
+            }
+
+            function stopSwipe() {
+                isDragging = false;
+            }
+        }
+
+        // Overlay slider
+        if (overlaySlider) {
+            overlaySlider.addEventListener('input', updateOverlayOpacity);
+        }
+
+        // Onion skin controls
+        if (onionOpacitySlider) {
+            onionOpacitySlider.addEventListener('input', updateOnionSkin);
+        }
+        if (onionBlendMode) {
+            onionBlendMode.addEventListener('change', updateOnionSkin);
+        }
+
+        // Flicker controls
+        if (flickerSpeedSlider) {
+            flickerSpeedSlider.addEventListener('input', () => {
+                flickerSpeedValue.textContent = flickerSpeedSlider.value;
+                if (flickerInterval) {
+                    stopFlicker();
+                    startFlicker();
+                }
+            });
+        }
+        if (flickerToggleBtn) {
+            flickerToggleBtn.addEventListener('click', toggleFlicker);
+        }
+
+        // Difference controls
+        if (diffThresholdSlider) {
+            diffThresholdSlider.addEventListener('input', () => {
+                diffThresholdValue.textContent = diffThresholdSlider.value;
+                updateDifferenceCanvas();
+            });
+        }
+        if (diffModeSelect) {
+            diffModeSelect.addEventListener('change', updateDifferenceCanvas);
+        }
+
+        // Heatmap controls
+        if (heatmapIntensitySlider) {
+            heatmapIntensitySlider.addEventListener('input', () => {
+                heatmapIntensityValue.textContent = heatmapIntensitySlider.value;
+                updateHeatmapCanvas();
+            });
+        }
+
+        // Edge controls
+        if (edgeThresholdSlider) {
+            edgeThresholdSlider.addEventListener('input', () => {
+                edgeThresholdValue.textContent = edgeThresholdSlider.value;
+                updateEdgeCanvas();
+            });
+        }
+        if (edgeDisplayMode) {
+            edgeDisplayMode.addEventListener('change', updateEdgeCanvas);
+        }
+
+        // Subtract controls
+        if (subtractAmplifySlider) {
+            subtractAmplifySlider.addEventListener('input', () => {
+                subtractAmplifyValue.textContent = subtractAmplifySlider.value;
+                updateSubtractCanvas();
+            });
+        }
+        if (subtractModeSelect) {
+            subtractModeSelect.addEventListener('change', updateSubtractCanvas);
+        }
+    }
+
+    // ===== Toast Notifications =====
+    function showToast(message, duration = 2000) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+    }
+
+    // ===== File Loading =====
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileURL = URL.createObjectURL(file);
+        video.src = fileURL;
+        video.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        video.addEventListener('loadedmetadata', () => {
+            isVideoLoaded = true;
+            calculateTotalFrames();
+            resetPlayer();
+            updateControlsState();
+            initializeCanvasSizes();
+            seqEndFrame.value = Math.min(30, totalFrames);
+            seqEndFrame.max = totalFrames;
+            seqStartFrame.max = totalFrames - 1;
+            showToast('Video loaded successfully!');
+        }, { once: true });
+    });
+
+    // ===== Core Logic =====
+    fpsInput.addEventListener('change', (e) => {
+        let val = parseFloat(e.target.value);
+        if (val < 1) val = 1;
+        if (val > 144) val = 144;
+        fps = val;
+        fpsInput.value = val;
+        if (isVideoLoaded) {
+            calculateTotalFrames();
+            const currentFrame = Math.floor(video.currentTime * fps);
+            frameSlider.max = totalFrames;
+            frameSlider.value = currentFrame;
+            updateDisplay(currentFrame);
+            updateFrameMarkers();
+        }
+    });
+
+    function calculateTotalFrames() {
+        const duration = video.duration;
+        totalFrames = Math.floor(duration * fps);
+        frameSlider.max = totalFrames;
+    }
+
+    function resetPlayer() {
+        video.currentTime = 0;
+        frameSlider.value = 0;
+        updateDisplay(0);
+        video.pause();
+        updatePlayPauseIcon(false);
+        clearMarkers();
+    }
+
+    function updateDisplay(frameNumber) {
+        currentFrameDisplay.textContent = `Frame: ${frameNumber} / ${totalFrames}`;
+        const time = frameNumber / fps;
+        const mins = Math.floor(time / 60);
+        const secs = Math.floor(time % 60);
+        const ms = Math.floor((time % 1) * 1000);
+        timeDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+    }
+
+    function updateControlsState() {
+        const enable = isVideoLoaded;
+        const buttons = [playPauseBtn, prevFrameBtn, nextFrameBtn, jumpStartBtn, jumpEndBtn, 
+                        jumpBackBtn, jumpForwardBtn, addBookmarkBtn, setFrameABtn, setFrameBBtn,
+                        setMarkerABtn, setMarkerBBtn, analyzeSequenceBtn];
+        buttons.forEach(btn => btn && (btn.disabled = !enable));
+        
+        if (frameSlider) frameSlider.disabled = !enable;
+        if (downloadFrameBtn) downloadFrameBtn.disabled = !enable;
+
+        const hasFrames = frameA !== null && frameB !== null;
+        if (jumpFrameABtn) jumpFrameABtn.disabled = frameA === null;
+        if (jumpFrameBBtn) jumpFrameBBtn.disabled = frameB === null;
+        if (goToMarkerABtn) goToMarkerABtn.disabled = frameA === null;
+        if (goToMarkerBBtn) goToMarkerBBtn.disabled = frameB === null;
+        if (clearMarkerABtn) clearMarkerABtn.disabled = frameA === null;
+        if (clearMarkerBBtn) clearMarkerBBtn.disabled = frameB === null;
+        if (generateReportBtn) generateReportBtn.disabled = !hasFrames;
+        if (copyReportBtn) copyReportBtn.disabled = !hasFrames;
+        if (exportReportBtn) exportReportBtn.disabled = !hasFrames;
+        if (exportComparisonBtn) exportComparisonBtn.disabled = !hasFrames;
+    }
+
+    function updatePlayPauseIcon(isPlaying) {
+        if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
+        if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+    }
+
+    // ===== Canvas Initialization =====
+    function initializeCanvasSizes() {
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        const allCanvases = [canvasA, canvasB, swipeCanvasA, swipeCanvasB, overlayCanvasA, overlayCanvasB,
+                            onionCanvasA, onionCanvasB, flickerCanvas, differenceCanvas, heatmapCanvas,
+                            edgeCanvas, redDiffCanvas, greenDiffCanvas, blueDiffCanvas, subtractCanvas];
+        
+        allCanvases.forEach(canvas => {
+            if (canvas) {
+                canvas.width = width;
+                canvas.height = height;
+            }
+        });
+    }
+
+    // ===== Playback Control =====
+    playPauseBtn?.addEventListener('click', () => {
+        if (video.paused) video.play();
+        else video.pause();
+    });
+
+    video.addEventListener('play', () => updatePlayPauseIcon(true));
+    video.addEventListener('pause', () => updatePlayPauseIcon(false));
+
+    speedSelect?.addEventListener('change', (e) => {
+        video.playbackRate = parseFloat(e.target.value);
+    });
+
+    // ===== Frame Navigation =====
+    prevFrameBtn?.addEventListener('click', () => stepFrame(-1));
+    nextFrameBtn?.addEventListener('click', () => stepFrame(1));
+
+    function stepFrame(direction) {
+        if (!isVideoLoaded) return;
+        video.pause();
+        let currentFrame = Math.floor(video.currentTime * fps);
+        currentFrame += direction;
+        seekToFrame(currentFrame);
+    }
+
+    function seekToFrame(frameNumber) {
+        if (frameNumber < 0) frameNumber = 0;
+        if (frameNumber > totalFrames) frameNumber = totalFrames;
+
+        const time = frameNumber / fps;
+        video.currentTime = time;
+        frameSlider.value = frameNumber;
+        updateDisplay(frameNumber);
+    }
+
+    function getCurrentFrame() {
+        return Math.floor(video.currentTime * fps);
+    }
+
+    // Jump controls
+    jumpStartBtn?.addEventListener('click', () => seekToFrame(0));
+    jumpEndBtn?.addEventListener('click', () => seekToFrame(totalFrames));
+    jumpFrameABtn?.addEventListener('click', () => frameA !== null && seekToFrame(frameA));
+    jumpFrameBBtn?.addEventListener('click', () => frameB !== null && seekToFrame(frameB));
+
+    jumpBackBtn?.addEventListener('click', () => {
+        const jump = parseInt(frameJumpInput.value) || 10;
+        stepFrame(-jump);
+    });
+
+    jumpForwardBtn?.addEventListener('click', () => {
+        const jump = parseInt(frameJumpInput.value) || 10;
+        stepFrame(jump);
+    });
+
+    // ===== Timeline Slider =====
+    frameSlider?.addEventListener('input', (e) => {
+        if (!isVideoLoaded) return;
+        isSeeking = true;
+        const frame = parseInt(e.target.value);
+        updateDisplay(frame);
+    });
+
+    frameSlider?.addEventListener('change', (e) => {
+        if (!isVideoLoaded) return;
+        const frame = parseInt(e.target.value);
+        video.pause();
+        seekToFrame(frame);
+        isSeeking = false;
+    });
+
+    video.addEventListener('timeupdate', () => {
+        if (!isSeeking && isVideoLoaded) {
+            const currentFrame = getCurrentFrame();
+            frameSlider.value = currentFrame;
+            updateDisplay(currentFrame);
+        }
+    });
+
+    // ===== Mode Tabs =====
+    modeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            modeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentMode = tab.dataset.mode;
+            switchMode(currentMode);
+        });
+    });
+
+    function switchMode(mode) {
+        viewContainers.forEach(v => v.classList.remove('active'));
+        const activeView = document.getElementById(mode + 'View');
+        if (activeView) activeView.classList.add('active');
+
+        stopFlicker();
+        updateCurrentView();
+    }
+
+    function updateCurrentView() {
+        switch(currentMode) {
+            case 'compare':
+            case 'swipe':
+                updateComparisonCanvases();
+                break;
+            case 'overlay':
+                updateOverlayCanvases();
+                break;
+            case 'onion':
+                updateOnionSkin();
+                break;
+            case 'flicker':
+                updateFlickerCanvas();
+                break;
+            case 'difference':
+                updateDifferenceCanvas();
+                break;
+            case 'heatmap':
+                updateHeatmapCanvas();
+                break;
+            case 'edge':
+                updateEdgeCanvas();
+                break;
+            case 'rgb':
+                updateRGBChannels();
+                break;
+            case 'subtract':
+                updateSubtractCanvas();
+                break;
+            case 'analysis':
+                if (frameAImageData && frameBImageData) {
+                    performRegionAnalysis();
+                }
+                break;
+        }
+    }
+
+    // ===== Frame Markers =====
+    function setFrameAMarker() {
+        if (!isVideoLoaded) return;
+        frameA = getCurrentFrame();
+        captureFrameA();
+        updateMarkerDisplays();
+        updateFrameMarkers();
+        updateControlsState();
+        updateCurrentView();
+        showToast(`Frame A set to ${frameA}`);
+    }
+
+    function setFrameBMarker() {
+        if (!isVideoLoaded) return;
+        frameB = getCurrentFrame();
+        captureFrameB();
+        updateMarkerDisplays();
+        updateFrameMarkers();
+        updateControlsState();
+        updateCurrentView();
+        showToast(`Frame B set to ${frameB}`);
+    }
+
+    function captureFrameA() {
+        const allCtx = [ctxA, swipeCanvasA?.getContext('2d'), overlayCanvasA?.getContext('2d'), 
+                       onionCanvasA?.getContext('2d')];
+        allCtx.forEach(ctx => {
+            if (ctx && ctx.canvas) {
+                ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+            }
+        });
+        if (ctxA) frameAImageData = ctxA.getImageData(0, 0, canvasA.width, canvasA.height);
+
+        const time = frameA / fps;
+        if (frameAInfo) frameAInfo.textContent = `Frame: ${frameA}`;
+        if (frameATime) frameATime.textContent = `Time: ${time.toFixed(3)}s`;
+    }
+
+    function captureFrameB() {
+        const allCtx = [ctxB, swipeCanvasB?.getContext('2d'), overlayCanvasB?.getContext('2d'), 
+                       onionCanvasB?.getContext('2d')];
+        allCtx.forEach(ctx => {
+            if (ctx && ctx.canvas) {
+                ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+            }
+        });
+        if (ctxB) frameBImageData = ctxB.getImageData(0, 0, canvasB.width, canvasB.height);
+
+        const time = frameB / fps;
+        if (frameBInfo) frameBInfo.textContent = `Frame: ${frameB}`;
+        if (frameBTime) frameBTime.textContent = `Time: ${time.toFixed(3)}s`;
+    }
+
+    function updateMarkerDisplays() {
+        if (markerADisplay) markerADisplay.textContent = frameA !== null ? `Frame ${frameA}` : 'Not Set';
+        if (markerBDisplay) markerBDisplay.textContent = frameB !== null ? `Frame ${frameB}` : 'Not Set';
+    }
+
+    function updateFrameMarkers() {
+        if (!frameMarkers) return;
+        frameMarkers.innerHTML = '';
+
+        if (frameA !== null) {
+            const marker = document.createElement('div');
+            marker.className = 'frame-marker marker-a';
+            marker.style.left = `${(frameA / totalFrames) * 100}%`;
+            marker.title = `Frame A: ${frameA}`;
+            marker.addEventListener('click', () => seekToFrame(frameA));
+            frameMarkers.appendChild(marker);
+        }
+
+        if (frameB !== null) {
+            const marker = document.createElement('div');
+            marker.className = 'frame-marker marker-b';
+            marker.style.left = `${(frameB / totalFrames) * 100}%`;
+            marker.title = `Frame B: ${frameB}`;
+            marker.addEventListener('click', () => seekToFrame(frameB));
+            frameMarkers.appendChild(marker);
+        }
+
+        bookmarks.forEach(frame => {
+            const marker = document.createElement('div');
+            marker.className = 'frame-marker bookmark';
+            marker.style.left = `${(frame / totalFrames) * 100}%`;
+            marker.title = `Bookmark: ${frame}`;
+            marker.addEventListener('click', () => seekToFrame(frame));
+            frameMarkers.appendChild(marker);
+        });
+    }
+
+    function clearMarkerA() {
+        frameA = null;
+        frameAImageData = null;
+        [ctxA, swipeCanvasA?.getContext('2d'), overlayCanvasA?.getContext('2d')].forEach(ctx => {
+            if (ctx && ctx.canvas) ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        });
+        if (frameAInfo) frameAInfo.textContent = 'Frame: --';
+        if (frameATime) frameATime.textContent = 'Time: --';
+        updateMarkerDisplays();
+        updateFrameMarkers();
+        updateControlsState();
+        showToast('Frame A cleared');
+    }
+
+    function clearMarkerB() {
+        frameB = null;
+        frameBImageData = null;
+        [ctxB, swipeCanvasB?.getContext('2d'), overlayCanvasB?.getContext('2d')].forEach(ctx => {
+            if (ctx && ctx.canvas) ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        });
+        if (frameBInfo) frameBInfo.textContent = 'Frame: --';
+        if (frameBTime) frameBTime.textContent = 'Time: --';
+        updateMarkerDisplays();
+        updateFrameMarkers();
+        updateControlsState();
+        showToast('Frame B cleared');
+    }
+
+    function clearMarkers() {
+        frameA = null;
+        frameB = null;
+        frameAImageData = null;
+        frameBImageData = null;
+        bookmarks = [];
+        regionAnalysisData = [];
+        updateMarkerDisplays();
+        updateFrameMarkers();
+        updateControlsState();
+        updateBookmarksList();
+    }
+
+    // Marker button event listeners
+    setFrameABtn?.addEventListener('click', setFrameAMarker);
+    setFrameBBtn?.addEventListener('click', setFrameBMarker);
+    setMarkerABtn?.addEventListener('click', setFrameAMarker);
+    setMarkerBBtn?.addEventListener('click', setFrameBMarker);
+    goToMarkerABtn?.addEventListener('click', () => frameA !== null && seekToFrame(frameA));
+    goToMarkerBBtn?.addEventListener('click', () => frameB !== null && seekToFrame(frameB));
+    clearMarkerABtn?.addEventListener('click', clearMarkerA);
+    clearMarkerBBtn?.addEventListener('click', clearMarkerB);
+    clearAllMarkersBtn?.addEventListener('click', () => {
+        clearMarkers();
+        showToast('All markers cleared');
+    });
+
+    // ===== Bookmarks =====
+    function addBookmark() {
+        if (!isVideoLoaded) return;
+        const frame = getCurrentFrame();
+        if (!bookmarks.includes(frame)) {
+            bookmarks.push(frame);
+            bookmarks.sort((a, b) => a - b);
+            updateBookmarksList();
+            updateFrameMarkers();
+            showToast(`Bookmark added at frame ${frame}`);
+        } else {
+            showToast('Frame already bookmarked');
+        }
+    }
+
+    function removeBookmark(frame) {
+        bookmarks = bookmarks.filter(b => b !== frame);
+        updateBookmarksList();
+        updateFrameMarkers();
+    }
+
+    function updateBookmarksList() {
+        if (!bookmarksList) return;
+        if (bookmarks.length === 0) {
+            bookmarksList.innerHTML = '<div class="empty-state">No bookmarks yet. Press B to add one.</div>';
+            return;
+        }
+
+        bookmarksList.innerHTML = bookmarks.map(frame => `
+            <div class="bookmark-item" data-frame="${frame}">
+                <span class="bookmark-frame">F${frame}</span>
+                <span class="text-muted">${(frame / fps).toFixed(2)}s</span>
+                <button class="bookmark-delete" data-frame="${frame}">&times;</button>
+            </div>
+        `).join('');
+
+        bookmarksList.querySelectorAll('.bookmark-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('bookmark-delete')) {
+                    seekToFrame(parseInt(item.dataset.frame));
+                }
+            });
+        });
+
+        bookmarksList.querySelectorAll('.bookmark-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeBookmark(parseInt(btn.dataset.frame));
+            });
+        });
+    }
+
+    addBookmarkBtn?.addEventListener('click', addBookmark);
+    clearBookmarksBtn?.addEventListener('click', () => {
+        bookmarks = [];
+        updateBookmarksList();
+        updateFrameMarkers();
+        showToast('All bookmarks cleared');
+    });
+
+    // ===== Comparison Views =====
+    function updateComparisonCanvases() {
+        // Already captured when markers were set
+        if (swipeCanvasA && swipeCanvasB && frameA !== null && frameB !== null) {
+            updateSwipeDivider(50);
+        }
+    }
+
+    function updateSwipeDivider(percent) {
+        if (!swipeDivider || !swipeCanvasB) return;
+        swipeDivider.style.left = percent + '%';
+        swipeCanvasB.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+    }
+
+    function updateOverlayCanvases() {
+        updateOverlayOpacity();
+    }
+
+    function updateOverlayOpacity() {
+        if (!overlaySlider || !overlayCanvasB || !overlayValue) return;
+        const opacity = parseInt(overlaySlider.value) / 100;
+        overlayValue.textContent = overlaySlider.value;
+        overlayCanvasB.style.opacity = opacity;
+    }
+
+    function updateOnionSkin() {
+        if (!onionCanvasB || !onionOpacitySlider || !onionBlendMode) return;
+        const opacity = parseInt(onionOpacitySlider.value) / 100;
+        if (onionOpacityValue) onionOpacityValue.textContent = onionOpacitySlider.value;
+        onionCanvasB.style.opacity = opacity;
+        onionCanvasB.style.mixBlendMode = onionBlendMode.value;
+    }
+
+    // ===== Flicker Mode =====
+    function updateFlickerCanvas() {
+        if (!flickerCanvas || !frameAImageData || !frameBImageData) return;
+        const ctx = flickerCanvas.getContext('2d');
+        ctx.putImageData(flickerState ? frameAImageData : frameBImageData, 0, 0);
+        updateFlickerIndicator();
+    }
+
+    function updateFlickerIndicator() {
+        if (!flickerIndicator) return;
+        flickerIndicator.className = `flicker-indicator ${flickerState ? 'frame-a' : 'frame-b'}`;
+        flickerIndicator.textContent = flickerState ? 'Frame A' : 'Frame B';
+    }
+
+    function toggleFlicker() {
+        if (flickerInterval) {
+            stopFlicker();
+        } else {
+            startFlicker();
+        }
+    }
+
+    function startFlicker() {
+        if (!frameAImageData || !frameBImageData) return;
+        const speed = parseInt(flickerSpeedSlider?.value || 500);
+        flickerInterval = setInterval(() => {
+            flickerState = !flickerState;
+            updateFlickerCanvas();
+        }, speed);
+        if (flickerToggleBtn) flickerToggleBtn.innerHTML = '⏸️ Pause';
+    }
+
+    function stopFlicker() {
+        if (flickerInterval) {
+            clearInterval(flickerInterval);
+            flickerInterval = null;
+            if (flickerToggleBtn) flickerToggleBtn.innerHTML = '▶️ Play';
+        }
+    }
+
+    // ===== Difference Canvas =====
+    function updateDifferenceCanvas() {
+        if (!differenceCanvas || !frameAImageData || !frameBImageData) {
+            const ctx = differenceCanvas?.getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = '#333';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Set both Frame A and Frame B', differenceCanvas.width / 2, differenceCanvas.height / 2);
+            }
+            return;
+        }
+
+        const threshold = parseInt(diffThresholdSlider?.value || 30);
+        const mode = diffModeSelect?.value || 'color';
+        const ctx = differenceCanvas.getContext('2d');
+        const width = differenceCanvas.width;
+        const height = differenceCanvas.height;
+        const dataA = frameAImageData.data;
+        const dataB = frameBImageData.data;
+        const diffImageData = ctx.createImageData(width, height);
+        const diffData = diffImageData.data;
+
+        for (let i = 0; i < dataA.length; i += 4) {
+            const diff = Math.abs(dataA[i] - dataB[i]) + Math.abs(dataA[i + 1] - dataB[i + 1]) + Math.abs(dataA[i + 2] - dataB[i + 2]);
+
+            if (mode === 'binary') {
+                const val = diff > threshold ? 255 : 0;
+                diffData[i] = diffData[i + 1] = diffData[i + 2] = val;
+                diffData[i + 3] = 255;
+            } else if (mode === 'grayscale') {
+                const val = Math.min(255, diff);
+                diffData[i] = diffData[i + 1] = diffData[i + 2] = val;
+                diffData[i + 3] = 255;
+            } else if (mode === 'amplified') {
+                const val = Math.min(255, diff * 5);
+                diffData[i] = diffData[i + 1] = diffData[i + 2] = val;
+                diffData[i + 3] = 255;
+            } else {
+                if (diff > threshold) {
+                    const brightnessA = (dataA[i] + dataA[i + 1] + dataA[i + 2]) / 3;
+                    const brightnessB = (dataB[i] + dataB[i + 1] + dataB[i + 2]) / 3;
+                    if (brightnessB > brightnessA) {
+                        diffData[i] = 0;
+                        diffData[i + 1] = 255;
+                        diffData[i + 2] = 0;
+                    } else {
+                        diffData[i] = 255;
+                        diffData[i + 1] = 0;
+                        diffData[i + 2] = 0;
+                    }
+                    diffData[i + 3] = Math.min(255, diff * 2);
+                } else {
+                    const gray = (dataA[i] + dataA[i + 1] + dataA[i + 2]) / 3;
+                    diffData[i] = diffData[i + 1] = diffData[i + 2] = gray * 0.5;
+                    diffData[i + 3] = 255;
+                }
+            }
+        }
+
+        ctx.putImageData(diffImageData, 0, 0);
+    }
+
+    // ===== Heatmap Canvas =====
+    function updateHeatmapCanvas() {
+        if (!heatmapCanvas || !frameAImageData || !frameBImageData) {
+            const ctx = heatmapCanvas?.getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = '#333';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Set both Frame A and Frame B', heatmapCanvas.width / 2, heatmapCanvas.height / 2);
+            }
+            return;
+        }
+
+        const intensity = parseInt(heatmapIntensitySlider?.value || 50) / 50;
+        const ctx = heatmapCanvas.getContext('2d');
+        const width = heatmapCanvas.width;
+        const height = heatmapCanvas.height;
+        const dataA = frameAImageData.data;
+        const dataB = frameBImageData.data;
+        const heatmapImageData = ctx.createImageData(width, height);
+        const heatData = heatmapImageData.data;
+
+        for (let i = 0; i < dataA.length; i += 4) {
+            const diff = (Math.abs(dataA[i] - dataB[i]) + Math.abs(dataA[i + 1] - dataB[i + 1]) + Math.abs(dataA[i + 2] - dataB[i + 2])) / 765;
+            const normalizedDiff = Math.min(1, diff * intensity);
+            const color = getHeatmapColor(normalizedDiff);
+            heatData[i] = color.r;
+            heatData[i + 1] = color.g;
+            heatData[i + 2] = color.b;
+            heatData[i + 3] = 255;
+        }
+
+        ctx.putImageData(heatmapImageData, 0, 0);
+    }
+
+    function getHeatmapColor(value) {
+        const colors = [
+            { r: 0, g: 0, b: 128 },
+            { r: 0, g: 0, b: 255 },
+            { r: 0, g: 255, b: 255 },
+            { r: 0, g: 255, b: 0 },
+            { r: 255, g: 255, b: 0 },
+            { r: 255, g: 127, b: 0 },
+            { r: 255, g: 0, b: 0 }
+        ];
+
+        const idx = value * (colors.length - 1);
+        const lower = Math.floor(idx);
+        const upper = Math.min(lower + 1, colors.length - 1);
+        const t = idx - lower;
+
+        return {
+            r: Math.round(colors[lower].r + (colors[upper].r - colors[lower].r) * t),
+            g: Math.round(colors[lower].g + (colors[upper].g - colors[lower].g) * t),
+            b: Math.round(colors[lower].b + (colors[upper].b - colors[lower].b) * t)
+        };
+    }
+
+    // ===== Edge Detection =====
+    function updateEdgeCanvas() {
+        if (!edgeCanvas || !frameAImageData || !frameBImageData) return;
+
+        const threshold = parseInt(edgeThresholdSlider?.value || 50);
+        const mode = edgeDisplayMode?.value || 'combined';
+        const ctx = edgeCanvas.getContext('2d');
+
+        const edgesA = detectEdges(frameAImageData, threshold);
+        const edgesB = detectEdges(frameBImageData, threshold);
+
+        const output = ctx.createImageData(edgeCanvas.width, edgeCanvas.height);
+        const data = output.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const idx = i / 4;
+            const eA = edgesA[idx];
+            const eB = edgesB[idx];
+
+            if (mode === 'frameA') {
+                data[i] = data[i + 1] = data[i + 2] = eA ? 255 : 0;
+            } else if (mode === 'frameB') {
+                data[i] = data[i + 1] = data[i + 2] = eB ? 255 : 0;
+            } else if (mode === 'difference') {
+                if (eA && !eB) {
+                    data[i] = 255; data[i + 1] = 0; data[i + 2] = 0;
+                } else if (!eA && eB) {
+                    data[i] = 0; data[i + 1] = 255; data[i + 2] = 0;
+                } else {
+                    data[i] = data[i + 1] = data[i + 2] = eA ? 128 : 0;
+                }
+            } else {
+                if (eA && eB) {
+                    data[i] = data[i + 1] = data[i + 2] = 255;
+                } else if (eA) {
+                    data[i] = 59; data[i + 1] = 130; data[i + 2] = 246;
+                } else if (eB) {
+                    data[i] = 16; data[i + 1] = 185; data[i + 2] = 129;
+                } else {
+                    data[i] = data[i + 1] = data[i + 2] = 0;
+                }
+            }
+            data[i + 3] = 255;
+        }
+
+        ctx.putImageData(output, 0, 0);
+    }
+
+    function detectEdges(imageData, threshold) {
+        const w = imageData.width;
+        const h = imageData.height;
+        const data = imageData.data;
+        const edges = new Uint8Array(w * h);
+
+        for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+                const idx = (y * w + x) * 4;
+                const gx = -data[idx - 4] + data[idx + 4];
+                const gy = -data[(y - 1) * w * 4 + x * 4] + data[(y + 1) * w * 4 + x * 4];
+                const magnitude = Math.sqrt(gx * gx + gy * gy);
+                edges[y * w + x] = magnitude > threshold ? 1 : 0;
+            }
+        }
+
+        return edges;
+    }
+
+    // ===== RGB Channels =====
+    function handleRGBSubTab(mode) {
+        const views = ['rgbDifferenceView', 'rgbSplitView', 'rgbHistogramView'];
+        views.forEach(v => {
+            const el = document.getElementById(v);
+            if (el) el.style.display = 'none';
+        });
+
+        const viewMap = { difference: 'rgbDifferenceView', split: 'rgbSplitView', histogram: 'rgbHistogramView' };
+        const activeView = document.getElementById(viewMap[mode]);
+        if (activeView) activeView.style.display = 'block';
+
+        if (frameAImageData && frameBImageData) {
+            updateRGBChannels();
+        }
+    }
+
+    function updateRGBChannels() {
+        if (!frameAImageData || !frameBImageData) return;
+
+        // RGB Difference
+        if (redDiffCanvas) drawChannelDiff(redDiffCanvas, 0);
+        if (greenDiffCanvas) drawChannelDiff(greenDiffCanvas, 1);
+        if (blueDiffCanvas) drawChannelDiff(blueDiffCanvas, 2);
+    }
+
+    function drawChannelDiff(canvas, channel) {
+        const ctx = canvas.getContext('2d');
+        const output = ctx.createImageData(canvas.width, canvas.height);
+        const dataA = frameAImageData.data;
+        const dataB = frameBImageData.data;
+        const out = output.data;
+
+        for (let i = 0; i < dataA.length; i += 4) {
+            const diff = Math.abs(dataA[i + channel] - dataB[i + channel]);
+            out[i + channel] = diff;
+            out[i + 3] = 255;
+        }
+
+        ctx.putImageData(output, 0, 0);
+    }
+
+    // ===== Subtract Mode =====
+    function updateSubtractCanvas() {
+        if (!subtractCanvas || !frameAImageData || !frameBImageData) return;
+
+        const amplify = parseInt(subtractAmplifySlider?.value || 5);
+        const mode = subtractModeSelect?.value || 'absolute';
+        const ctx = subtractCanvas.getContext('2d');
+        const output = ctx.createImageData(subtractCanvas.width, subtractCanvas.height);
+        const dataA = frameAImageData.data;
+        const dataB = frameBImageData.data;
+        const out = output.data;
+        let sumSquaredError = 0;
+        let maxDiff = 0;
+
+        for (let i = 0; i < dataA.length; i += 4) {
+            let r, g, b;
+            
+            if (mode === 'signed') {
+                r = 128 + (dataA[i] - dataB[i]) * amplify;
+                g = 128 + (dataA[i + 1] - dataB[i + 1]) * amplify;
+                b = 128 + (dataA[i + 2] - dataB[i + 2]) * amplify;
+            } else if (mode === 'signedReverse') {
+                r = 128 + (dataB[i] - dataA[i]) * amplify;
+                g = 128 + (dataB[i + 1] - dataA[i + 1]) * amplify;
+                b = 128 + (dataB[i + 2] - dataA[i + 2]) * amplify;
+            } else {
+                r = Math.abs(dataA[i] - dataB[i]) * amplify;
+                g = Math.abs(dataA[i + 1] - dataB[i + 1]) * amplify;
+                b = Math.abs(dataA[i + 2] - dataB[i + 2]) * amplify;
+            }
+
+            out[i] = Math.max(0, Math.min(255, r));
+            out[i + 1] = Math.max(0, Math.min(255, g));
+            out[i + 2] = Math.max(0, Math.min(255, b));
+            out[i + 3] = 255;
+
+            const diff = Math.abs(dataA[i] - dataB[i]) + Math.abs(dataA[i + 1] - dataB[i + 1]) + Math.abs(dataA[i + 2] - dataB[i + 2]);
+            sumSquaredError += diff * diff;
+            maxDiff = Math.max(maxDiff, diff);
+        }
+
+        ctx.putImageData(output, 0, 0);
+
+        // Calculate metrics
+        const mse = sumSquaredError / (dataA.length / 4);
+        const psnr = 20 * Math.log10(255 * Math.sqrt(3)) - 10 * Math.log10(mse);
+        const ssim = calculateSSIM(frameAImageData, frameBImageData);
+
+        if (ssimValue) ssimValue.textContent = ssim.toFixed(4);
+        if (psnrValue) psnrValue.textContent = psnr.toFixed(2);
+    }
+
+    function calculateSSIM(imgA, imgB) {
+        const dataA = imgA.data;
+        const dataB = imgB.data;
+        let meanA = 0, meanB = 0;
+        const pixels = dataA.length / 4;
+
+        for (let i = 0; i < dataA.length; i += 4) {
+            meanA += (dataA[i] + dataA[i + 1] + dataA[i + 2]) / 3;
+            meanB += (dataB[i] + dataB[i + 1] + dataB[i + 2]) / 3;
+        }
+        meanA /= pixels;
+        meanB /= pixels;
+
+        let varA = 0, varB = 0, covar = 0;
+        for (let i = 0; i < dataA.length; i += 4) {
+            const grayA = (dataA[i] + dataA[i + 1] + dataA[i + 2]) / 3;
+            const grayB = (dataB[i] + dataB[i + 1] + dataB[i + 2]) / 3;
+            varA += (grayA - meanA) ** 2;
+            varB += (grayB - meanB) ** 2;
+            covar += (grayA - meanA) * (grayB - meanB);
+        }
+        varA /= pixels;
+        varB /= pixels;
+        covar /= pixels;
+
+        const c1 = 6.5025, c2 = 58.5225;
+        return ((2 * meanA * meanB + c1) * (2 * covar + c2)) / ((meanA ** 2 + meanB ** 2 + c1) * (varA + varB + c2));
+    }
+
+    // ===== Region Analysis =====
+    function performRegionAnalysis() {
+        if (!frameAImageData || !frameBImageData || !regionGrid) return;
+
+        const width = frameAImageData.width;
+        const height = frameAImageData.height;
+        const cellWidth = Math.floor(width / gridSize);
+        const cellHeight = Math.floor(height / gridSize);
+        const dataA = frameAImageData.data;
+        const dataB = frameBImageData.data;
+
+        regionAnalysisData = [];
+
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                const startX = col * cellWidth;
+                const startY = row * cellHeight;
+                const endX = Math.min(startX + cellWidth, width);
+                const endY = Math.min(startY + cellHeight, height);
+
+                let totalDiff = 0;
+                let pixelCount = 0;
+                let changedPixels = 0;
+
+                for (let y = startY; y < endY; y++) {
+                    for (let x = startX; x < endX; x++) {
+                        const i = (y * width + x) * 4;
+                        const diff = Math.abs(dataA[i] - dataB[i]) + Math.abs(dataA[i + 1] - dataB[i + 1]) + Math.abs(dataA[i + 2] - dataB[i + 2]);
+                        totalDiff += diff;
+                        pixelCount++;
+                        if (diff > 30) changedPixels++;
+                    }
+                }
+
+                const avgDiff = totalDiff / (pixelCount * 765) * 100;
+                const changePercent = (changedPixels / pixelCount) * 100;
+
+                regionAnalysisData.push({
+                    row, col,
+                    name: `R${row + 1}C${col + 1}`,
+                    avgDiff: avgDiff.toFixed(2),
+                    changePercent: changePercent.toFixed(2),
+                    changedPixels,
+                    totalPixels: pixelCount
+                });
+            }
+        }
+
+        renderRegionGrid();
+        renderHistogram();
+        renderChangeLists();
+        updateStatistics();
+    }
+
+    function renderRegionGrid() {
+        if (!regionGrid) return;
+        regionGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+        regionGrid.innerHTML = regionAnalysisData.map(region => {
+            const color = getHeatmapColor(parseFloat(region.avgDiff) / 30);
+            return `
+                <div class="region-cell" 
+                     style="background-color: rgb(${color.r}, ${color.g}, ${color.b});"
+                     title="${region.name}: ${region.changePercent}% changed"
+                     data-region="${region.name}">
+                    <span class="region-value">${region.changePercent}%</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderHistogram() {
+        if (!changeHistogram) return;
+        const buckets = new Array(20).fill(0);
+        regionAnalysisData.forEach(region => {
+            const bucket = Math.min(19, Math.floor(parseFloat(region.changePercent) / 5));
+            buckets[bucket]++;
+        });
+
+        const maxCount = Math.max(...buckets, 1);
+        changeHistogram.innerHTML = buckets.map((count, i) => {
+            const height = (count / maxCount) * 100;
+            return `<div class="histogram-bar" style="height: ${height}%" title="${i * 5}-${(i + 1) * 5}%: ${count} regions"></div>`;
+        }).join('');
+    }
+
+    function renderChangeLists() {
+        const sorted = [...regionAnalysisData].sort((a, b) => parseFloat(b.changePercent) - parseFloat(a.changePercent));
+
+        if (highChangeList) {
+            highChangeList.innerHTML = sorted.slice(0, 5).map((region, i) => {
+                const changeClass = parseFloat(region.changePercent) > 20 ? 'high' : parseFloat(region.changePercent) > 10 ? 'medium' : 'low';
+                return `
+                    <div class="region-item">
+                        <span class="region-rank">#${i + 1}</span>
+                        <span class="region-name">${region.name}</span>
+                        <span class="region-change ${changeClass}">${region.changePercent}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        if (lowChangeList) {
+            lowChangeList.innerHTML = sorted.slice(-5).reverse().map((region, i) => `
+                <div class="region-item">
+                    <span class="region-rank">#${i + 1}</span>
+                    <span class="region-name">${region.name}</span>
+                    <span class="region-change low">${region.changePercent}%</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    function updateStatistics() {
+        if (regionAnalysisData.length === 0) return;
+
+        const totalChange = regionAnalysisData.reduce((sum, r) => sum + parseFloat(r.changePercent), 0) / regionAnalysisData.length;
+        const totalPixelsChanged = regionAnalysisData.reduce((sum, r) => sum + r.changedPixels, 0);
+        const maxChange = Math.max(...regionAnalysisData.map(r => parseFloat(r.changePercent)));
+        const minChange = Math.min(...regionAnalysisData.map(r => parseFloat(r.changePercent)));
+
+        const statTotal = document.getElementById('statTotalChange');
+        const statPixels = document.getElementById('statPixelsChanged');
+        const statMax = document.getElementById('statMaxChange');
+        const statMin = document.getElementById('statMinChange');
+
+        if (statTotal) statTotal.textContent = totalChange.toFixed(2) + '%';
+        if (statPixels) statPixels.textContent = totalPixelsChanged.toLocaleString();
+        if (statMax) statMax.textContent = maxChange.toFixed(2) + '%';
+        if (statMin) statMin.textContent = minChange.toFixed(2) + '%';
+    }
+
+    // ===== Report Generation =====
+    generateReportBtn?.addEventListener('click', generateReport);
+    copyReportBtn?.addEventListener('click', copyReport);
+
+    function generateReport() {
+        if (!frameAImageData || !frameBImageData || !reportContent) return;
+
+        performRegionAnalysis();
+
+        const sorted = [...regionAnalysisData].sort((a, b) => parseFloat(b.changePercent) - parseFloat(a.changePercent));
+        const totalChange = regionAnalysisData.reduce((sum, r) => sum + parseFloat(r.changePercent), 0) / regionAnalysisData.length;
+        const totalPixelsChanged = regionAnalysisData.reduce((sum, r) => sum + r.changedPixels, 0);
+        const totalPixels = regionAnalysisData.reduce((sum, r) => sum + r.totalPixels, 0);
+
+        const report = `
+═══════════════════════════════════════════════════════════
+               FRAME COMPARISON ANALYSIS REPORT
+═══════════════════════════════════════════════════════════
+
+📋 OVERVIEW
+───────────────────────────────────────────────────────────
+Frame A:           ${frameA} (${(frameA / fps).toFixed(3)}s)
+Frame B:           ${frameB} (${(frameB / fps).toFixed(3)}s)
+Frame Difference:  ${Math.abs(frameB - frameA)} frames (${Math.abs((frameB - frameA) / fps).toFixed(3)}s)
+Video FPS:         ${fps}
+Analysis Grid:     ${gridSize}×${gridSize} (${gridSize * gridSize} regions)
+Resolution:        ${frameAImageData.width}×${frameAImageData.height}
+
+📊 SUMMARY STATISTICS
+───────────────────────────────────────────────────────────
+Average Change:    ${totalChange.toFixed(2)}%
+Pixels Changed:    ${totalPixelsChanged.toLocaleString()} / ${totalPixels.toLocaleString()} (${((totalPixelsChanged / totalPixels) * 100).toFixed(2)}%)
+Max Region Change: ${Math.max(...regionAnalysisData.map(r => parseFloat(r.changePercent))).toFixed(2)}%
+Min Region Change: ${Math.min(...regionAnalysisData.map(r => parseFloat(r.changePercent))).toFixed(2)}%
+
+📺 TOP 5 MOST CHANGED REGIONS
+───────────────────────────────────────────────────────────
+${sorted.slice(0, 5).map((r, i) => `${i + 1}. ${r.name.padEnd(8)} ${r.changePercent.padStart(6)}% change  (${r.changedPixels.toLocaleString()} pixels)`).join('\n')}
+
+📻 TOP 5 LEAST CHANGED REGIONS
+───────────────────────────────────────────────────────────
+${sorted.slice(-5).reverse().map((r, i) => `${i + 1}. ${r.name.padEnd(8)} ${r.changePercent.padStart(6)}% change  (${r.changedPixels.toLocaleString()} pixels)`).join('\n')}
+
+📝 FULL REGION BREAKDOWN
+───────────────────────────────────────────────────────────
+${regionAnalysisData.map(r => `${r.name}: ${r.changePercent}% (${r.changedPixels} pixels)`).join('\n')}
+
+═══════════════════════════════════════════════════════════
+Generated: ${new Date().toISOString()}
+═══════════════════════════════════════════════════════════
+        `.trim();
+
+        reportContent.textContent = report;
+        showToast('Report generated!');
+    }
+
+    function copyReport() {
+        if (!reportContent) return;
+        navigator.clipboard.writeText(reportContent.textContent).then(() => {
+            showToast('Report copied to clipboard!');
+        });
+    }
+
+    // ===== Sequence Analysis =====
+    analyzeSequenceBtn?.addEventListener('click', analyzeSequence);
+
+    async function analyzeSequence() {
+        const startFrame = parseInt(seqStartFrame?.value || 0);
+        const endFrame = parseInt(seqEndFrame?.value || 30);
+        const step = parseInt(seqStep?.value || 1);
+
+        if (startFrame >= endFrame) {
+            showToast('Start frame must be less than end frame');
+            return;
+        }
+
+        if (analyzeSequenceBtn) analyzeSequenceBtn.disabled = true;
+        if (sequenceProgress) sequenceProgress.style.display = 'block';
+        sequenceAnalysisData = [];
+
+        const frames = [];
+        for (let f = startFrame; f <= endFrame; f += step) {
+            frames.push(f);
+        }
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+
+        let prevImageData = null;
+        const regionAccumulators = {};
+
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                regionAccumulators[`R${row + 1}C${col + 1}`] = [];
+            }
+        }
+
+        for (let i = 0; i < frames.length; i++) {
+            const frame = frames[i];
+            
+            video.currentTime = frame / fps;
+            await new Promise(resolve => { video.onseeked = resolve; });
+
+            tempCtx.drawImage(video, 0, 0);
+            const currentImageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+
+            if (prevImageData) {
+                const frameChange = calculateFrameChange(prevImageData, currentImageData, regionAccumulators);
+                sequenceAnalysisData.push({
+                    frame,
+                    prevFrame: frames[i - 1],
+                    change: frameChange.totalChange,
+                    regionChanges: frameChange.regionChanges
+                });
+            }
+
+            prevImageData = currentImageData;
+            if (sequenceProgressFill) sequenceProgressFill.style.width = `${((i + 1) / frames.length) * 100}%`;
+        }
+
+        renderSequenceTimeline();
+        renderMotionGrids(regionAccumulators);
+        generateSequenceReport(regionAccumulators);
+
+        if (sequenceProgress) sequenceProgress.style.display = 'none';
+        if (analyzeSequenceBtn) analyzeSequenceBtn.disabled = false;
+        showToast('Sequence analysis complete!');
+    }
+
+    function calculateFrameChange(imageDataA, imageDataB, regionAccumulators) {
+        const width = imageDataA.width;
+        const height = imageDataA.height;
+        const dataA = imageDataA.data;
+        const dataB = imageDataB.data;
+        const cellWidth = Math.floor(width / gridSize);
+        const cellHeight = Math.floor(height / gridSize);
+
+        let totalDiff = 0;
+        let totalPixels = 0;
+        const regionChanges = {};
+
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                const regionName = `R${row + 1}C${col + 1}`;
+                const startX = col * cellWidth;
+                const startY = row * cellHeight;
+                const endX = Math.min(startX + cellWidth, width);
+                const endY = Math.min(startY + cellHeight, height);
+
+                let regionDiff = 0;
+                let regionPixels = 0;
+
+                for (let y = startY; y < endY; y++) {
+                    for (let x = startX; x < endX; x++) {
+                        const i = (y * width + x) * 4;
+                        const diff = Math.abs(dataA[i] - dataB[i]) + Math.abs(dataA[i + 1] - dataB[i + 1]) + Math.abs(dataA[i + 2] - dataB[i + 2]);
+                        regionDiff += diff;
+                        regionPixels++;
+                    }
+                }
+
+                const avgRegionChange = (regionDiff / (regionPixels * 765)) * 100;
+                regionChanges[regionName] = avgRegionChange;
+                regionAccumulators[regionName].push(avgRegionChange);
+                totalDiff += regionDiff;
+                totalPixels += regionPixels;
+            }
+        }
+
+        return {
+            totalChange: (totalDiff / (totalPixels * 765)) * 100,
+            regionChanges
+        };
+    }
+
+    function renderSequenceTimeline() {
+        if (!sequenceTimeline || sequenceAnalysisData.length === 0) return;
+
+        const maxChange = Math.max(...sequenceAnalysisData.map(d => d.change));
+
+        sequenceTimeline.innerHTML = sequenceAnalysisData.map(data => {
+            const height = (data.change / maxChange) * 100;
+            const color = getHeatmapColor(data.change / maxChange);
+            return `
+                <div class="sequence-frame" 
+                     style="height: ${Math.max(5, height)}%; background-color: rgb(${color.r}, ${color.g}, ${color.b});"
+                     title="Frame ${data.frame}: ${data.change.toFixed(2)}% change from frame ${data.prevFrame}"
+                     data-frame="${data.frame}">
+                </div>
+            `;
+        }).join('');
+
+        sequenceTimeline.querySelectorAll('.sequence-frame').forEach(el => {
+            el.addEventListener('click', () => {
+                seekToFrame(parseInt(el.dataset.frame));
+            });
+        });
+    }
+
+    function renderMotionGrids(regionAccumulators) {
+        const avgChanges = {};
+        Object.keys(regionAccumulators).forEach(region => {
+            const values = regionAccumulators[region];
+            avgChanges[region] = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+        });
+
+        const maxChange = Math.max(...Object.values(avgChanges), 1);
+
+        if (motionHotspotGrid) {
+            motionHotspotGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            motionHotspotGrid.innerHTML = Object.entries(avgChanges)
+                .sort((a, b) => {
+                    const [rowA, colA] = a[0].match(/R(\d+)C(\d+)/).slice(1).map(Number);
+                    const [rowB, colB] = b[0].match(/R(\d+)C(\d+)/).slice(1).map(Number);
+                    return rowA - rowB || colA - colB;
+                })
+                .map(([region, change]) => {
+                    const color = getHeatmapColor(change / maxChange);
+                    return `
+                        <div class="region-cell" 
+                             style="background-color: rgb(${color.r}, ${color.g}, ${color.b});"
+                             title="${region}: ${change.toFixed(2)}% avg change">
+                            <span class="region-value">${change.toFixed(1)}%</span>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        if (staticAreaGrid) {
+            staticAreaGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            staticAreaGrid.innerHTML = Object.entries(avgChanges)
+                .sort((a, b) => {
+                    const [rowA, colA] = a[0].match(/R(\d+)C(\d+)/).slice(1).map(Number);
+                    const [rowB, colB] = b[0].match(/R(\d+)C(\d+)/).slice(1).map(Number);
+                    return rowA - rowB || colA - colB;
+                })
+                .map(([region, change]) => {
+                    const stability = 1 - (change / maxChange);
+                    const color = getHeatmapColor(stability);
+                    return `
+                        <div class="region-cell" 
+                             style="background-color: rgb(${color.r}, ${color.g}, ${color.b});"
+                             title="${region}: ${(100 - change).toFixed(2)}% stability">
+                            <span class="region-value">${(100 - change).toFixed(1)}%</span>
+                        </div>
+                    `;
+                }).join('');
+        }
+    }
+
+    function generateSequenceReport(regionAccumulators) {
+        if (sequenceAnalysisData.length === 0 || !sequenceReportContent) return;
+
+        const avgChanges = {};
+        Object.keys(regionAccumulators).forEach(region => {
+            const values = regionAccumulators[region];
+            avgChanges[region] = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+        });
+
+        const sortedByChange = Object.entries(avgChanges).sort((a, b) => b[1] - a[1]);
+        const totalAvgChange = sequenceAnalysisData.reduce((sum, d) => sum + d.change, 0) / sequenceAnalysisData.length;
+        const maxFrameChange = Math.max(...sequenceAnalysisData.map(d => d.change));
+        const minFrameChange = Math.min(...sequenceAnalysisData.map(d => d.change));
+        const maxChangeFrame = sequenceAnalysisData.find(d => d.change === maxFrameChange);
+        const minChangeFrame = sequenceAnalysisData.find(d => d.change === minFrameChange);
+
+        const report = `
+═══════════════════════════════════════════════════════════
+               SEQUENCE ANALYSIS SUMMARY
+═══════════════════════════════════════════════════════════
+
+📋 SEQUENCE INFO
+───────────────────────────────────────────────────────────
+Start Frame:       ${seqStartFrame?.value}
+End Frame:         ${seqEndFrame?.value}
+Step:              ${seqStep?.value}
+Frames Analyzed:   ${sequenceAnalysisData.length + 1}
+Transitions:       ${sequenceAnalysisData.length}
+
+📊 CHANGE STATISTICS
+───────────────────────────────────────────────────────────
+Average Change:    ${totalAvgChange.toFixed(4)}%
+Max Frame Change:  ${maxFrameChange.toFixed(4)}% (Frame ${maxChangeFrame?.frame} from ${maxChangeFrame?.prevFrame})
+Min Frame Change:  ${minFrameChange.toFixed(4)}% (Frame ${minChangeFrame?.frame} from ${minChangeFrame?.prevFrame})
+
+🔥 MOTION HOTSPOTS (Most Active Regions)
+───────────────────────────────────────────────────────────
+${sortedByChange.slice(0, 5).map((r, i) => `${i + 1}. ${r[0].padEnd(8)} ${r[1].toFixed(4)}% average change`).join('\n')}
+
+🧊 STATIC AREAS (Least Active Regions)
+───────────────────────────────────────────────────────────
+${sortedByChange.slice(-5).reverse().map((r, i) => `${i + 1}. ${r[0].padEnd(8)} ${r[1].toFixed(4)}% average change`).join('\n')}
+
+📈 FRAME-BY-FRAME CHANGES
+───────────────────────────────────────────────────────────
+${sequenceAnalysisData.slice(0, 20).map(d => `F${d.prevFrame} → F${d.frame}: ${d.change.toFixed(4)}%`).join('\n')}
+${sequenceAnalysisData.length > 20 ? `\n... and ${sequenceAnalysisData.length - 20} more transitions` : ''}
+
+═══════════════════════════════════════════════════════════
+Generated: ${new Date().toISOString()}
+═══════════════════════════════════════════════════════════
+        `.trim();
+
+        sequenceReportContent.textContent = report;
+    }
+
+    // ===== Download Frame =====
+    downloadFrameBtn?.addEventListener('click', () => {
+        if (!isVideoLoaded) return;
+
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = video.videoWidth;
+        tempCanvas.height = video.videoHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(video, 0, 0);
+
+        const link = document.createElement('a');
+        link.download = `frame_${getCurrentFrame()}.png`;
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+
+        showToast(`Frame ${getCurrentFrame()} downloaded`);
+    });
+
+    // ===== Export Report =====
+    exportReportBtn?.addEventListener('click', () => {
+        if (!reportContent) return;
+        generateReport();
+        
+        const blob = new Blob([reportContent.textContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `frame_analysis_${frameA}_${frameB}_${Date.now()}.txt`;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast('Report exported!');
+    });
+
+    // ===== Export Comparison =====
+    exportComparisonBtn?.addEventListener('click', () => {
+        if (!frameAImageData || !frameBImageData) return;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create side-by-side comparison
+        canvas.width = frameAImageData.width * 2;
+        canvas.height = frameAImageData.height;
+        
+        const tempCanvasA = document.createElement('canvas');
+        tempCanvasA.width = frameAImageData.width;
+        tempCanvasA.height = frameAImageData.height;
+        tempCanvasA.getContext('2d').putImageData(frameAImageData, 0, 0);
+        
+        const tempCanvasB = document.createElement('canvas');
+        tempCanvasB.width = frameBImageData.width;
+        tempCanvasB.height = frameBImageData.height;
+        tempCanvasB.getContext('2d').putImageData(frameBImageData, 0, 0);
+        
+        ctx.drawImage(tempCanvasA, 0, 0);
+        ctx.drawImage(tempCanvasB, frameAImageData.width, 0);
+        
+        const link = document.createElement('a');
+        link.download = `comparison_${frameA}_${frameB}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        showToast('Comparison exported!');
+    });
+
+    // ===== Keyboard Shortcuts =====
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+        switch(e.key) {
+            case ' ':
+                e.preventDefault();
+                if (isVideoLoaded) {
+                    if (video.paused) video.play();
+                    else video.pause();
+                }
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (e.shiftKey) {
+                    const jump = parseInt(frameJumpInput?.value) || 10;
+                    stepFrame(-jump);
+                } else {
+                    stepFrame(-1);
+                }
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                if (e.shiftKey) {
+                    const jump = parseInt(frameJumpInput?.value) || 10;
+                    stepFrame(jump);
+                } else {
+                    stepFrame(1);
+                }
+                break;
+            case 'Home':
+                e.preventDefault();
+                seekToFrame(0);
+                break;
+            case 'End':
+                e.preventDefault();
+                seekToFrame(totalFrames);
+                break;
+            case 'a':
+            case 'A':
+                setFrameAMarker();
+                break;
+            case 's':
+            case 'S':
+                setFrameBMarker();
+                break;
+            case '1':
+                if (frameA !== null) seekToFrame(frameA);
+                break;
+            case '2':
+                if (frameB !== null) seekToFrame(frameB);
+                break;
+            case 'b':
+            case 'B':
+                addBookmark();
+                break;
+            case 'r':
+            case 'R':
+                if (frameA !== null && frameB !== null) {
+                    generateReport();
+                }
+                break;
+        }
+    });
+
+    // Initialize
+    init();
+</script>
+</body>
+</html>

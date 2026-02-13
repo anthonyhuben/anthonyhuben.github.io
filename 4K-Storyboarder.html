@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Animation Drawing Tool</title>
+    <style>
+        /* Base styling with cartoon handdrawn effect */
+        @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+        
+        body {
+            font-family: 'Indie Flower', cursive;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #c51b7d; /* Magenta base from screenshot */
+            color: #fff;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z' fill='%23ffffff' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        /* Main layout */
+        .container {
+            display: grid;
+            grid-template-columns: 170px 1fr;
+            grid-template-rows: 70px 1fr 150px;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Tool panel styles */
+        .tool-panel {
+            grid-column: 1;
+            grid-row: 2;
+            background-color: #ae1967; /* Slightly darker magenta */
+            padding: 10px;
+            border-right: 3px solid #fff; /* White border */
+            border-radius: 0 0 10px 0;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tool-panel h3 {
+            color: #fff;
+            text-align: center;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+            margin-bottom: 3px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            font-size: 16px;
+            transform: rotate(-1deg);
+        }
+
+        .tool-button {
+            padding: 5px 8px;
+            background-color: #d82088; /* Brighter magenta for buttons */
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Indie Flower', cursive;
+            font-size: 13px;
+            font-weight: bold;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            position: relative;
+            transform: rotate(-0.5deg);
+            /* Sketchy border effect */
+            border-style: solid;
+            border-color: white;
+            background-clip: padding-box;
+        }
+
+        .tool-button:nth-child(odd) {
+            transform: rotate(1deg);
+        }
+
+        .tool-button:hover {
+            background-color: #e74da0;
+            transform: scale(1.05) rotate(0deg);
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.25);
+        }
+
+        .tool-button.active {
+            background-color: #f06bb2;
+            border-color: #ffff00;
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.2);
+            transform: scale(0.98) rotate(0deg);
+        }
+
+        /* Drawing canvas container */
+        .canvas-container {
+            grid-column: 2;
+            grid-row: 2;
+            overflow: hidden;
+            position: relative;
+            background-color: #f8e6ef; /* Very light magenta for canvas */
+            border-left: 4px dashed #fff;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* Make the SVG canvas fill the container */
+        #drawing-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* Timeline styles */
+        .timeline {
+            grid-column: 1 / span 2;
+            grid-row: 3;
+            background-color: #ae1967; /* Slightly darker magenta */
+            border-top: 2px solid #fff;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .timeline-frames {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 6px 8px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 100px;
+        }
+
+        .frame {
+            width: 60px;
+            height: 80px;
+            background-color: #d82088;
+            border: 2px solid white;
+            border-radius: 6px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            transform: rotate(-0.5deg);
+        }
+
+        .frame:nth-child(even) {
+            transform: rotate(1deg);
+        }
+
+        .frame.active {
+            border-color: #ffff00;
+            transform: scale(1.05) rotate(0deg);
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        }
+
+        .frame svg {
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-color: #fce4ec;
+        }
+        
+        .frame-repeat {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 5px;
+            font-size: 10px;
+            padding: 2px 4px;
+            z-index: 5;
+        }
+        
+        .frame-repeat-edit {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30px;
+            height: 18px;
+            background-color: #ff94c7;
+            border: 2px solid white;
+            color: white;
+            font-size: 10px;
+            border-radius: 0 0 0 8px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+            font-family: 'Indie Flower', cursive;
+        }
+        
+        .frame:hover .frame-repeat-edit {
+            display: block;
+        }
+
+        /* Top panel */
+        .top-panel {
+            grid-column: 1 / span 2;
+            grid-row: 1;
+            background-color: #ae1967;
+            border-bottom: 2px solid #fff;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .status-indicator {
+            background-color: #d82088;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid white;
+            font-size: 11px;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            color: white;
+            margin-right: auto;
+        }
+        
+        .top-panel-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .file-operations {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .top-panel .color-picker {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .top-panel .stroke-width {
+            margin: 0;
+            min-width: 100px;
+        }
+
+        /* Color picker */
+        .color-picker {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid white;
+            margin-top: 4px;
+        }
+
+        .color-picker label {
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .color-picker input {
+            border: 1px solid white;
+            padding: 3px;
+            background-color: transparent;
+            border-radius: 6px;
+        }
+        
+        .color-picker.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        /* FPS slider */
+        .fps-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid white;
+        }
+        
+        .fps-slider {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .fps-slider input {
+            width: 100%;
+            height: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        
+        .fps-slider input::-webkit-slider-runnable-track {
+            height: 6px;
+            background: #e74da0;
+            border-radius: 6px;
+            border: 1px solid white;
+        }
+        
+        .fps-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            margin-top: -5px;
+            border: 1px solid #ae1967;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .fps-value {
+            font-size: 13px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            background-color: #e74da0;
+            padding: 3px 6px;
+            border-radius: 6px;
+            border: 1px solid white;
+            box-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        
+        /* Color palettes */
+        .color-palettes {
+            margin-top: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid white;
+        }
+        
+        .color-palettes h4 {
+            margin: 5px 0 3px 0;
+            font-size: 13px;
+            color: white;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+        }
+        
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        
+        .color-swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: transform 0.1s, border-color 0.1s;
+            box-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.2);
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+        }
+        
+        .color-swatch.active {
+            border-color: #ffff00;
+            box-shadow: 0 0 8px #ffff00;
+        }
+
+        /* Stroke width control */
+        .stroke-width {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid white;
+        }
+
+        .stroke-width label {
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .stroke-width input {
+            width: 100%;
+            height: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .stroke-width input::-webkit-slider-runnable-track {
+            height: 6px;
+            background: #e74da0;
+            border-radius: 6px;
+            border: 1px solid white;
+        }
+
+        .stroke-width input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            margin-top: -5px;
+            border: 1px solid #ae1967;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .stroke-width span {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c51b7d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e74da0;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f06bb2;
+        }
+
+        /* File inputs - special styling */
+        input[type="file"] {
+            border: 2px dashed white;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Indie Flower', cursive;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Panel -->
+        <div class="top-panel">
+            <div class="status-indicator">
+                <span id="position">Position: 0,0</span>
+                <span id="frame-status">Frame: 1/1</span>
+            </div>
+            <div class="file-operations">
+                <button id="save-svg" class="tool-button">Save Frame</button>
+                <button id="save-all-frames" class="tool-button">Save All</button>
+                <button id="load-svg" class="tool-button">Load SVG</button>
+                <input type="file" id="svg-file-input" style="display: none;" accept=".svg">
+            </div>
+            <div class="top-panel-controls">
+                <div class="stroke-width">
+                    <input type="range" id="stroke-width" min="1" max="100" value="20">
+                    <span id="width-value">20px</span>
+                </div>
+                <div class="color-picker">
+                    <input type="color" id="stroke-color" value="#000000">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tool Panel -->
+        <div class="tool-panel">
+            <h3>Drawing Tools</h3>
+            <button id="pencil-tool" class="tool-button active">Pencil</button>
+            <button id="eraser-tool" class="tool-button">Eraser</button>
+            <button id="select-line-tool" class="tool-button">Select Line</button>
+            
+            <div class="color-palettes">
+                <h4>Neon Colors</h4>
+                <div class="palette neon-palette">
+                    <div class="color-swatch" data-color="#ff00ff" style="background-color: #ff00ff;"></div>
+                    <div class="color-swatch" data-color="#00ffff" style="background-color: #00ffff;"></div>
+                    <div class="color-swatch" data-color="#ff0099" style="background-color: #ff0099;"></div>
+                    <div class="color-swatch" data-color="#33ff00" style="background-color: #33ff00;"></div>
+                    <div class="color-swatch" data-color="#ff3300" style="background-color: #ff3300;"></div>
+                    <div class="color-swatch" data-color="#ffff00" style="background-color: #ffff00;"></div>
+                    <div class="color-swatch" data-color="#00ff99" style="background-color: #00ff99;"></div>
+                    <div class="color-swatch" data-color="#9900ff" style="background-color: #9900ff;"></div>
+                </div>
+                
+                <h4>Calming Colors</h4>
+                <div class="palette calm-palette">
+                    <div class="color-swatch" data-color="#6495ED" style="background-color: #6495ED;"></div>
+                    <div class="color-swatch" data-color="#98FB98" style="background-color: #98FB98;"></div>
+                    <div class="color-swatch" data-color="#FFA07A" style="background-color: #FFA07A;"></div>
+                    <div class="color-swatch" data-color="#DDA0DD" style="background-color: #DDA0DD;"></div>
+                    <div class="color-swatch" data-color="#87CEEB" style="background-color: #87CEEB;"></div>
+                    <div class="color-swatch" data-color="#F0E68C" style="background-color: #F0E68C;"></div>
+                    <div class="color-swatch" data-color="#E6E6FA" style="background-color: #E6E6FA;"></div>
+                    <div class="color-swatch" data-color="#ffffff" style="background-color: #ffffff;"></div>
+                </div>
+            </div>
+            
+            <h3>Frame Options</h3>
+            <button id="copy-frame" class="tool-button">Copy Frame</button>
+            <button id="paste-frame" class="tool-button">Paste Frame</button>
+        </div>
+
+        <!-- Drawing Canvas -->
+        <div class="canvas-container">
+            <svg id="drawing-canvas" viewBox="0 0 3840 2160" preserveAspectRatio="xMidYMid meet">
+                <!-- Paths will be drawn here -->
+            </svg>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline">
+            <div class="timeline-controls">
+                <button id="add-frame" class="tool-button">Add Frame</button>
+                <button id="delete-frame" class="tool-button">Delete Frame</button>
+                <button id="clear-frame" class="tool-button">Clear Frame</button>
+                <button id="toggle-onionskin" class="tool-button">Toggle Onion Skin</button>
+                <button id="play" class="tool-button">Play</button>
+                <button id="stop" class="tool-button">Stop</button>
+                <div class="fps-slider-container">
+                    <div class="fps-slider">
+                        <input type="range" id="fps-slider" min="1" max="24" value="24" step="1">
+                    </div>
+                    <div class="fps-value">24fps</div>
+                </div>
+            </div>
+            <div class="timeline-frames" id="frames-container">
+                <!-- Frames will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // Main application state
+        const app = {
+            currentTool: 'pencil',
+            currentColor: '#000000',
+            currentWidth: 20,
+            isDrawing: false,
+            currentPath: null,
+            pathPoints: [],
+            frames: [],
+            currentFrame: 0,
+            animationInterval: null,
+            fps: 24,
+            canvasWidth: 3840, // 4K width
+            canvasHeight: 2160, // 4K height
+            onionSkinning: false,
+            selectedLine: null,
+            selectedLineIndex: -1,
+            rotationHandle: null,
+            lineRotation: null,
+            originalStroke: null,
+            copyBuffer: null,
+            lastEraserPos: null // For eraser tool
+        };
+
+        // DOM Elements
+        const canvas = document.getElementById('drawing-canvas');
+        const framesContainer = document.getElementById('frames-container');
+        const positionDisplay = document.getElementById('position');
+        const frameStatusDisplay = document.getElementById('frame-status');
+        const strokeWidthInput = document.getElementById('stroke-width');
+        const widthValueDisplay = document.getElementById('width-value');
+        const strokeColorInput = document.getElementById('stroke-color');
+        
+        // FPS dial elements
+        const fpsDial = document.querySelector('.fps-dial');
+        const fpsDialIndicator = document.querySelector('.fps-dial-indicator');
+        const fpsDialValue = document.querySelector('.fps-dial-value');
+
+        // Tool buttons
+        const pencilButton = document.getElementById('pencil-tool');
+        const eraserButton = document.getElementById('eraser-tool');
+        const selectLineButton = document.getElementById('select-line-tool');
+        const clearFrameButton = document.getElementById('clear-frame');
+        
+        // Color picker element
+        const colorPicker = document.querySelector('.color-picker');
+        
+        // Frame option buttons
+        const toggleOnionskinButton = document.getElementById('toggle-onionskin');
+        const copyFrameButton = document.getElementById('copy-frame');
+        const pasteFrameButton = document.getElementById('paste-frame');
+        
+        // File operation buttons
+        const saveSvgButton = document.getElementById('save-svg');
+        const saveAllFramesButton = document.getElementById('save-all-frames');
+        const loadSvgButton = document.getElementById('load-svg');
+        const svgFileInput = document.getElementById('svg-file-input');
+
+        // Timeline controls
+        const addFrameButton = document.getElementById('add-frame');
+        const deleteFrameButton = document.getElementById('delete-frame');
+        const playButton = document.getElementById('play');
+        const stopButton = document.getElementById('stop');
+
+        // Initialize the app
+        function init() {
+            // Create the first frame
+            createNewFrame();
+            updateFrameStatus();
+
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize active color swatch for black (default color)
+            const defaultSwatch = document.querySelector('.color-swatch[data-color="#000000"]');
+            if (defaultSwatch) {
+                defaultSwatch.classList.add('active');
+            } else {
+                // If there's no black swatch in the palette, add active class to first calming color
+                const firstSwatch = document.querySelector('.calm-palette .color-swatch');
+                if (firstSwatch) {
+                    firstSwatch.classList.add('active');
+                }
+            }
+            
+            // Store mouse position for point selection
+            canvas.addEventListener('mousedown', (evt) => {
+                app.isDrawing = true;
+                app.lastMousePos = getMousePosition(evt);
+            });
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Drawing canvas events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+            canvas.addEventListener('mousemove', updatePosition);
+
+            // Tool selection
+            pencilButton.addEventListener('click', () => setTool('pencil'));
+            eraserButton.addEventListener('click', () => setTool('eraser'));
+            selectLineButton.addEventListener('click', () => setTool('select-line'));
+            clearFrameButton.addEventListener('click', clearCurrentFrame);
+            
+            // FPS slider control
+            setupFpsSlider();
+            
+            // File operations
+            saveSvgButton.addEventListener('click', saveFrameAsSVG);
+            saveAllFramesButton.addEventListener('click', saveAllFrames);
+            loadSvgButton.addEventListener('click', () => svgFileInput.click());
+            svgFileInput.addEventListener('change', loadSVG);
+
+            // Style controls
+            strokeWidthInput.addEventListener('input', updateStrokeWidth);
+            strokeColorInput.addEventListener('input', updateStrokeColor);
+            
+            // Frame options
+            toggleOnionskinButton.addEventListener('click', function() {
+                app.onionSkinning = !app.onionSkinning;
+                toggleOnionskinButton.classList.toggle('active', app.onionSkinning);
+                updateOnionSkinning();
+            });
+            
+            copyFrameButton.addEventListener('click', function() {
+                if (app.frames.length === 0) return;
+                
+                app.copyBuffer = {
+                    paths: JSON.parse(JSON.stringify(app.frames[app.currentFrame].paths)),
+                    repeatCount: app.frames[app.currentFrame].repeatCount
+                };
+            });
+            
+            pasteFrameButton.addEventListener('click', function() {
+                if (!app.copyBuffer) return;
+                
+                // Create a new frame
+                const frameGroup = createNewFrame();
+                const newFrameIndex = app.frames.length - 1;
+                
+                // Get the new frame data
+                const frame = app.frames[newFrameIndex];
+                
+                // Copy all paths from the buffer
+                app.copyBuffer.paths.forEach(pathData => {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', pathData.d);
+                    path.setAttribute('stroke', pathData.stroke);
+                    path.setAttribute('stroke-width', pathData['stroke-width']);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke-linecap', 'round');
+                    path.setAttribute('stroke-linejoin', 'round');
+                    frame.element.appendChild(path);
+                    
+                    // Add to frame's paths array
+                    frame.paths.push(JSON.parse(JSON.stringify(pathData)));
+                });
+                
+                // Copy repeat count
+                if (app.copyBuffer.repeatCount) {
+                    frame.repeatCount = app.copyBuffer.repeatCount;
+                    
+                    // Update the repeat count display
+                    const repeatDisplay = framesContainer.children[newFrameIndex].querySelector('.frame-repeat');
+                    const repeatEdit = framesContainer.children[newFrameIndex].querySelector('.frame-repeat-edit');
+                    
+                    if (repeatDisplay) repeatDisplay.textContent = app.copyBuffer.repeatCount;
+                    if (repeatEdit) repeatEdit.value = app.copyBuffer.repeatCount;
+                }
+                
+                // Update the thumbnail
+                updateThumbnailForFrame(newFrameIndex);
+                
+                // Select the new frame
+                selectFrame(newFrameIndex);
+            });
+            
+            // Color palette swatches
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const color = swatch.getAttribute('data-color');
+                    setStrokeColor(color);
+                    
+                    // Update active state
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                });
+            });
+
+            // Timeline controls
+            addFrameButton.addEventListener('click', addNewFrame);
+            deleteFrameButton.addEventListener('click', deleteCurrentFrame);
+            playButton.addEventListener('click', playAnimation);
+            stopButton.addEventListener('click', stopAnimation);
+        }
+
+        // Create a new frame
+        function createNewFrame() {
+            // Create a new SVG group for the frame
+            const frameGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            frameGroup.classList.add('frame-group');
+            
+            // Add the frame data to our app state
+            app.frames.push({
+                element: frameGroup,
+                paths: [],
+                repeatCount: 1
+            });
+
+            // Add to the canvas
+            canvas.appendChild(frameGroup);
+
+            // Create a thumbnail for the timeline
+            const frameThumbnail = document.createElement('div');
+            frameThumbnail.classList.add('frame');
+            
+            // Create a thumbnail SVG
+            const thumbnailSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            thumbnailSvg.setAttribute('viewBox', `0 0 ${app.canvasWidth} ${app.canvasHeight}`);
+            thumbnailSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+            frameThumbnail.appendChild(thumbnailSvg);
+            
+            // Add repeat count display
+            const repeatDisplay = document.createElement('div');
+            repeatDisplay.classList.add('frame-repeat');
+            repeatDisplay.textContent = '1';
+            frameThumbnail.appendChild(repeatDisplay);
+            
+            // Add repeat count edit input
+            const repeatEdit = document.createElement('input');
+            repeatEdit.type = 'number';
+            repeatEdit.min = '1';
+            repeatEdit.max = '24';
+            repeatEdit.value = '1';
+            repeatEdit.classList.add('frame-repeat-edit');
+            
+            repeatEdit.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent frame selection when clicking the input
+            });
+            
+            repeatEdit.addEventListener('change', () => {
+                const frameIndex = app.frames.findIndex(frame => frame.element === frameGroup);
+                const value = parseInt(repeatEdit.value, 10);
+                
+                // Validate input (1-24)
+                if (value < 1) repeatEdit.value = '1';
+                if (value > 24) repeatEdit.value = '24';
+                
+                // Update the frame data and display
+                app.frames[frameIndex].repeatCount = parseInt(repeatEdit.value, 10);
+                repeatDisplay.textContent = repeatEdit.value;
+            });
+            
+            frameThumbnail.appendChild(repeatEdit);
+
+            // Frame selection event
+            frameThumbnail.addEventListener('click', () => {
+                selectFrame(app.frames.findIndex(frame => frame.element === frameGroup));
+            });
+
+            framesContainer.appendChild(frameThumbnail);
+
+            // If this is our first frame, set it as the current frame
+            if (app.frames.length === 1) {
+                selectFrame(0);
+            }
+
+            return frameGroup;
+        }
+
+        // Add a new frame
+        function addNewFrame() {
+            createNewFrame();
+            selectFrame(app.frames.length - 1);
+            updateFrameStatus();
+        }
+
+        // Delete the current frame
+        function deleteCurrentFrame() {
+            if (app.frames.length <= 1) {
+                alert("You can't delete the only frame!");
+                return;
+            }
+
+            // Remove the frame from the DOM
+            canvas.removeChild(app.frames[app.currentFrame].element);
+            framesContainer.removeChild(framesContainer.children[app.currentFrame]);
+
+            // Remove from our state
+            app.frames.splice(app.currentFrame, 1);
+
+            // Select an appropriate frame
+            if (app.currentFrame >= app.frames.length) {
+                selectFrame(app.frames.length - 1);
+            } else {
+                selectFrame(app.currentFrame);
+            }
+
+            updateFrameStatus();
+        }
+
+        // Select a frame
+        function selectFrame(index) {
+            // Hide all frames
+            app.frames.forEach(frame => {
+                frame.element.style.display = 'none';
+            });
+            
+            // Remove active class from all thumbnails
+            Array.from(framesContainer.children).forEach(thumbnail => {
+                thumbnail.classList.remove('active');
+            });
+
+            // Show the selected frame
+            app.currentFrame = index;
+            app.frames[index].element.style.display = 'block';
+            framesContainer.children[index].classList.add('active');
+            
+            // Clear selected line when changing frames
+            clearSelectedLine();
+            
+            // Setup onion skinning for the newly selected frame
+            if (app.onionSkinning) {
+                updateOnionSkinning();
+            }
+            
+            updateFrameStatus();
+        }
+
+        // Clear the current frame
+        function clearCurrentFrame() {
+            const frame = app.frames[app.currentFrame];
+            
+            // Clear all paths from the frame group
+            while (frame.element.firstChild) {
+                frame.element.removeChild(frame.element.firstChild);
+            }
+            
+            // Clear the thumbnail SVG
+            const thumbnail = framesContainer.children[app.currentFrame].querySelector('svg');
+            while (thumbnail.firstChild) {
+                thumbnail.removeChild(thumbnail.firstChild);
+            }
+            
+            // Clear the paths array
+            frame.paths = [];
+        }
+
+        // Get mouse position relative to the SVG canvas
+        function getMousePosition(evt) {
+            const CTM = canvas.getScreenCTM();
+            return {
+                x: (evt.clientX - CTM.e) / CTM.a,
+                y: (evt.clientY - CTM.f) / CTM.d
+            };
+        }
+
+        // Start drawing
+        function startDrawing(evt) {
+            // If in select line mode, handle line selection instead
+            if (app.currentTool === 'select-line') {
+                handleLineSelection(evt);
+                return;
+            }
+            
+            const pos = getMousePosition(evt);
+            app.isDrawing = true;
+            app.pathPoints = [`M ${pos.x} ${pos.y}`];
+            
+            // For eraser tool, initialize lastEraserPos
+            if (app.currentTool === 'eraser') {
+                app.lastEraserPos = pos;
+                
+                // Create a visual feedback path for the eraser
+                app.currentPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                app.currentPath.setAttribute('d', app.pathPoints.join(' '));
+                app.currentPath.setAttribute('stroke', 'rgba(255, 0, 0, 0.3)'); // Transparent red for eraser visualization
+                app.currentPath.setAttribute('stroke-width', app.currentWidth);
+                app.currentPath.setAttribute('fill', 'none');
+                app.currentPath.setAttribute('stroke-linecap', 'round');
+                app.currentPath.setAttribute('stroke-linejoin', 'round');
+                
+                // Add to the current frame temporarily (will be removed)
+                app.frames[app.currentFrame].element.appendChild(app.currentPath);
+            } else {
+                // Create a new regular path element
+                app.currentPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                app.currentPath.setAttribute('d', app.pathPoints.join(' '));
+                app.currentPath.setAttribute('stroke', app.currentColor);
+                app.currentPath.setAttribute('stroke-width', app.currentWidth);
+                app.currentPath.setAttribute('fill', 'none');
+                app.currentPath.setAttribute('stroke-linecap', 'round');
+                app.currentPath.setAttribute('stroke-linejoin', 'round');
+                
+                // Add to the current frame
+                app.frames[app.currentFrame].element.appendChild(app.currentPath);
+            }
+        }
+
+        // Draw while the mouse is moving
+        function draw(evt) {
+            // If in select line mode, handle line movement/rotation instead
+            if (app.currentTool === 'select-line') {
+                moveSelectedLine(evt);
+                return;
+            }
+            
+            if (!app.isDrawing) return;
+            
+            const pos = getMousePosition(evt);
+            
+            // For regular drawing tools, just add to the current path
+            if (app.currentTool !== 'eraser') {
+                app.pathPoints.push(`L ${pos.x} ${pos.y}`);
+                app.currentPath.setAttribute('d', app.pathPoints.join(' '));
+            } else {
+                // For eraser, we need to check intersections with existing paths
+                app.pathPoints.push(`L ${pos.x} ${pos.y}`);
+                
+                // Update the current path for visual feedback (semi-transparent)
+                app.currentPath.setAttribute('d', app.pathPoints.join(' '));
+                
+                // Check for intersections with all existing paths in the current frame
+                checkEraserIntersections(pos);
+            }
+        }
+
+        // Stop drawing
+        function stopDrawing(evt) {
+            // For selection tool, stop line manipulation
+            if (app.currentTool === 'select-line' && app.isDrawing) {
+                app.isDrawing = false;
+                // Save the updated path data if a line is selected
+                if (app.selectedLine) {
+                    const frameIndex = app.currentFrame;
+                    const pathIndex = app.selectedLineIndex;
+                    if (app.frames[frameIndex].paths[pathIndex]) {
+                        app.frames[frameIndex].paths[pathIndex].d = app.selectedLine.getAttribute('d');
+                        updateThumbnail();
+                    }
+                }
+                return;
+            }
+            
+            if (!app.isDrawing) return;
+            
+            app.isDrawing = false;
+            
+            // For eraser tool, remove the visual feedback path
+            if (app.currentTool === 'eraser') {
+                if (app.currentPath && app.currentPath.parentNode) {
+                    app.currentPath.parentNode.removeChild(app.currentPath);
+                }
+                app.currentPath = null;
+                app.lastEraserPos = null;
+            } else {
+                // Add the path to the frame's path list for regular drawing tools
+                if (app.currentPath) {
+                    app.frames[app.currentFrame].paths.push({
+                        d: app.currentPath.getAttribute('d'),
+                        stroke: app.currentPath.getAttribute('stroke'),
+                        'stroke-width': app.currentPath.getAttribute('stroke-width')
+                    });
+                    
+                    // Update the thumbnail
+                    updateThumbnail();
+                }
+                
+                app.currentPath = null;
+            }
+        }
+
+        // Check for and handle eraser intersections
+        function checkEraserIntersections(currentPos) {
+            if (!app.lastEraserPos) {
+                app.lastEraserPos = currentPos;
+                return;
+            }
+            
+            // Get all paths in the current frame
+            const paths = Array.from(app.frames[app.currentFrame].element.querySelectorAll('path'));
+            const eraserRadius = app.currentWidth / 2;
+            
+            // For each path, check if the eraser intersects it
+            paths.forEach((path, pathIndex) => {
+                // Skip the current eraser path
+                if (path === app.currentPath) return;
+                
+                // Check for intersection with the eraser stroke
+                const isIntersecting = checkPathIntersection(
+                    path, 
+                    app.lastEraserPos, 
+                    currentPos, 
+                    eraserRadius
+                );
+                
+                if (isIntersecting) {
+                    // Modify or remove the path
+                    modifyErasedPath(path, pathIndex, app.lastEraserPos, currentPos, eraserRadius);
+                }
+            });
+            
+            // Update last eraser position
+            app.lastEraserPos = currentPos;
+        }
+
+        // Function to check if eraser stroke intersects with a path
+        function checkPathIntersection(path, lastPos, currentPos, eraserRadius) {
+            // For a basic implementation, we'll use a simplified approach
+            // Check if any point on the path is within the eraser's stroke area
+            
+            const pathLength = path.getTotalLength();
+            const samples = Math.max(20, Math.floor(pathLength / 10)); // Sample points along the path
+            
+            // Create a rectangular area that encompasses the eraser stroke
+            const minX = Math.min(lastPos.x, currentPos.x) - eraserRadius;
+            const maxX = Math.max(lastPos.x, currentPos.x) + eraserRadius;
+            const minY = Math.min(lastPos.y, currentPos.y) - eraserRadius;
+            const maxY = Math.max(lastPos.y, currentPos.y) + eraserRadius;
+            
+            // Check if any point on the path is within the eraser stroke area
+            for (let i = 0; i <= samples; i++) {
+                const point = path.getPointAtLength(i * (pathLength / samples));
+                
+                // Simple rectangular check first for efficiency
+                if (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY) {
+                    // More precise distance check to the line segment formed by the eraser stroke
+                    const distance = distanceToLineSegment(
+                        point.x, point.y,
+                        lastPos.x, lastPos.y,
+                        currentPos.x, currentPos.y
+                    );
+                    
+                    if (distance <= eraserRadius) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        // Calculate distance from a point to a line segment
+        function distanceToLineSegment(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let param = -1;
+            
+            if (lenSq !== 0) {
+                param = dot / lenSq;
+            }
+            
+            let xx, yy;
+            
+            if (param < 0) {
+                xx = x1;
+                yy = y1;
+            } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+            
+            const dx = px - xx;
+            const dy = py - yy;
+            
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // Modify a path when it's intersected by the eraser
+        function modifyErasedPath(path, pathIndex, lastPos, currentPos, eraserRadius) {
+            const frameData = app.frames[app.currentFrame];
+            const pathData = frameData.paths[pathIndex];
+            
+            if (!pathData) return; // Safety check
+            
+            // Simple approach: Remove the entire path if it's small enough
+            const pathLength = path.getTotalLength();
+            if (pathLength < eraserRadius * 3) {
+                // Remove the whole path if it's small
+                path.remove();
+                frameData.paths.splice(pathIndex, 1);
+                return;
+            }
+            
+            // For larger paths, split the path at intersection points
+            const segments = splitPathAtEraserIntersection(path, lastPos, currentPos, eraserRadius);
+            
+            if (segments.length === 0) {
+                // If no valid segments remain, remove the path
+                path.remove();
+                frameData.paths.splice(pathIndex, 1);
+            } else {
+                // Replace the original path with the segments
+                path.remove();
+                frameData.paths.splice(pathIndex, 1);
+                
+                // Add each segment as a new path
+                segments.forEach(segment => {
+                    if (segment.points.length < 2) return; // Skip too small segments
+                    
+                    const newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const pathDefinition = `M ${segment.points.join(' L ')}`;
+                    
+                    newPath.setAttribute('d', pathDefinition);
+                    newPath.setAttribute('stroke', pathData.stroke);
+                    newPath.setAttribute('stroke-width', pathData['stroke-width']);
+                    newPath.setAttribute('fill', 'none');
+                    newPath.setAttribute('stroke-linecap', 'round');
+                    newPath.setAttribute('stroke-linejoin', 'round');
+                    
+                    // Add to the current frame
+                    frameData.element.appendChild(newPath);
+                    
+                    // Add to the paths data
+                    frameData.paths.push({
+                        d: pathDefinition,
+                        stroke: pathData.stroke,
+                        'stroke-width': pathData['stroke-width']
+                    });
+                });
+            }
+            
+            // Update the thumbnail
+            updateThumbnail();
+        }
+
+        // Split a path at eraser intersection points
+        function splitPathAtEraserIntersection(path, lastPos, currentPos, eraserRadius) {
+            const pathLength = path.getTotalLength();
+            const segments = [];
+            let currentSegment = { points: [] };
+            let inEraserZone = false;
+            
+            // Sample points along the path to determine which parts to keep
+            const sampleDensity = Math.min(5, pathLength / 100); // Sample every 5px or less
+            const numSamples = Math.ceil(pathLength / sampleDensity);
+            
+            for (let i = 0; i <= numSamples; i++) {
+                const distance = i * sampleDensity;
+                const point = path.getPointAtLength(distance);
+                
+                // Check if this point is within the eraser stroke
+                const distToEraser = distanceToLineSegment(
+                    point.x, point.y,
+                    lastPos.x, lastPos.y,
+                    currentPos.x, currentPos.y
+                );
+                
+                const pointInEraserZone = distToEraser <= eraserRadius;
+                
+                // If we transition from outside to inside the eraser zone
+                if (!inEraserZone && pointInEraserZone) {
+                    inEraserZone = true;
+                    
+                    // End the current segment if it has points
+                    if (currentSegment.points.length > 0) {
+                        segments.push(currentSegment);
+                        currentSegment = { points: [] };
+                    }
+                }
+                // If we transition from inside to outside the eraser zone
+                else if (inEraserZone && !pointInEraserZone) {
+                    inEraserZone = false;
+                    
+                    // Start a new segment
+                    currentSegment = { points: [`${point.x} ${point.y}`] };
+                }
+                // If we're outside the eraser zone, add to the current segment
+                else if (!inEraserZone) {
+                    currentSegment.points.push(`${point.x} ${point.y}`);
+                }
+            }
+            
+            // Add the last segment if it has points
+            if (currentSegment.points.length > 0 && !inEraserZone) {
+                segments.push(currentSegment);
+            }
+            
+            return segments;
+        }
+
+        // Update the thumbnail for the current frame
+        function updateThumbnail() {
+            updateThumbnailForFrame(app.currentFrame);
+        }
+        
+        // Update the thumbnail for a specific frame
+        function updateThumbnailForFrame(frameIndex) {
+            if (frameIndex < 0 || frameIndex >= app.frames.length) return;
+            
+            const thumbnail = framesContainer.children[frameIndex].querySelector('svg');
+            
+            // Clear the thumbnail
+            while (thumbnail.firstChild) {
+                thumbnail.removeChild(thumbnail.firstChild);
+            }
+            
+            // Copy all paths to the thumbnail
+            app.frames[frameIndex].paths.forEach(pathData => {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData.d);
+                path.setAttribute('stroke', pathData.stroke);
+                path.setAttribute('stroke-width', pathData['stroke-width']);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                thumbnail.appendChild(path);
+            });
+        }
+
+        // Set the current tool
+        function setTool(tool) {
+            app.currentTool = tool;
+            
+            // Clear any selections when changing tools
+            clearSelectedLine();
+            
+            // Update UI for tools
+            pencilButton.classList.toggle('active', tool === 'pencil');
+            eraserButton.classList.toggle('active', tool === 'eraser');
+            selectLineButton.classList.toggle('active', tool === 'select-line');
+            
+            // Disable color picker when eraser is active
+            if (tool === 'eraser') {
+                colorPicker.classList.add('disabled');
+            } else {
+                colorPicker.classList.remove('disabled');
+            }
+            
+            // Update cursor
+            if (tool === 'select-line') {
+                canvas.style.cursor = 'pointer';
+            } else if (tool === 'pencil' || tool === 'eraser') {
+                canvas.style.cursor = 'crosshair';
+            }
+        }
+        
+        // Handle line selection in select-line mode
+        function handleLineSelection(evt) {
+            const pos = getMousePosition(evt);
+            const frame = app.frames[app.currentFrame];
+            
+            // Clear previous selection
+            clearSelectedLine();
+            
+            // Get all paths in the current frame
+            const paths = Array.from(frame.element.querySelectorAll('path'));
+            
+            // Try to find a path near the click position
+            for (let i = 0; i < paths.length; i++) {
+                const path = paths[i];
+                
+                // Check if the click is near the path
+                if (isPointNearPath(pos, path)) {
+                    selectLine(path, i);
+                    
+                    // Store initial rotation data
+                    app.lineRotation = {
+                        startAngle: Math.atan2(pos.y - app.lineCenterY, pos.x - app.lineCenterX),
+                        center: { x: app.lineCenterX, y: app.lineCenterY },
+                        initialPath: path.getAttribute('d')
+                    };
+                    
+                    break;
+                }
+            }
+        }
+        
+        // Check if a point is near a path
+        function isPointNearPath(point, path) {
+            const pathLength = path.getTotalLength();
+            const threshold = 15; // Distance in pixels to consider "near" the path
+            
+            // Sample points along the path to find closest point
+            let closestDistance = Infinity;
+            
+            for (let i = 0; i < pathLength; i += 5) {
+                const pathPoint = path.getPointAtLength(i);
+                const distance = Math.sqrt(
+                    Math.pow(pathPoint.x - point.x, 2) + 
+                    Math.pow(pathPoint.y - point.y, 2)
+                );
+                
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                }
+            }
+            
+            return closestDistance < threshold;
+        }
+        
+        // Select a line (path)
+        function selectLine(path, index) {
+            // Store the original stroke for restoration
+            app.originalStroke = {
+                color: path.getAttribute('stroke'),
+                width: path.getAttribute('stroke-width')
+            };
+            
+            // Highlight the selected line
+            path.setAttribute('stroke-dasharray', '5,5');
+            path.setAttribute('stroke-width', parseInt(path.getAttribute('stroke-width')) + 2);
+            
+            // Store the selected line
+            app.selectedLine = path;
+            app.selectedLineIndex = index;
+            
+            // Calculate center of the line for rotation
+            calculateLineCenter(path);
+            
+            // Add rotation handle
+            addRotationHandle();
+        }
+        
+        // Calculate the center point of a path
+        function calculateLineCenter(path) {
+            const bbox = path.getBBox();
+            app.lineCenterX = bbox.x + bbox.width / 2;
+            app.lineCenterY = bbox.y + bbox.height / 2;
+        }
+        
+        // Add a rotation handle to the selected line
+        function addRotationHandle() {
+            // Create rotation handle
+            const handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            handle.setAttribute('cx', app.lineCenterX);
+            handle.setAttribute('cy', app.lineCenterY);
+            handle.setAttribute('r', 8);
+            handle.setAttribute('fill', 'rgba(255, 121, 176, 0.7)');
+            handle.setAttribute('stroke', '#ffffff');
+            handle.setAttribute('stroke-width', 2);
+            handle.setAttribute('class', 'rotation-handle');
+            
+            // Add to canvas
+            canvas.appendChild(handle);
+            
+            // Store handle
+            app.rotationHandle = handle;
+        }
+        
+        // Clear selected line
+        function clearSelectedLine() {
+            if (app.selectedLine) {
+                // Restore original appearance
+                if (app.originalStroke) {
+                    app.selectedLine.setAttribute('stroke', app.originalStroke.color);
+                    app.selectedLine.setAttribute('stroke-width', app.originalStroke.width);
+                }
+                app.selectedLine.removeAttribute('stroke-dasharray');
+                
+                // Remove rotation handle
+                if (app.rotationHandle && app.rotationHandle.parentNode) {
+                    app.rotationHandle.parentNode.removeChild(app.rotationHandle);
+                }
+                
+                // Clear selection
+                app.selectedLine = null;
+                app.selectedLineIndex = -1;
+                app.rotationHandle = null;
+                app.lineRotation = null;
+            }
+        }
+        
+        // Move and rotate the selected line
+        function moveSelectedLine(evt) {
+            if (!app.selectedLine || !app.isDrawing) return;
+            
+            const pos = getMousePosition(evt);
+            
+            // Calculate rotation angle
+            const currentAngle = Math.atan2(pos.y - app.lineRotation.center.y, pos.x - app.lineRotation.center.x);
+            const deltaAngle = currentAngle - app.lineRotation.startAngle;
+            
+            // Apply rotation to the path
+            rotatePath(app.selectedLine, app.lineRotation.initialPath, deltaAngle, app.lineRotation.center);
+            
+            // Update rotation handle position
+            if (app.rotationHandle) {
+                app.rotationHandle.setAttribute('cx', app.lineCenterX);
+                app.rotationHandle.setAttribute('cy', app.lineCenterY);
+            }
+        }
+        
+        // Rotate a path around a center point
+        function rotatePath(pathElement, initialPathData, angle, center) {
+            // Parse the initial path data to extract points
+            const commands = initialPathData.match(/[MLHVCSQTAZmlhvcsqtaz][^MLHVCSQTAZmlhvcsqtaz]*/g) || [];
+            let newPathData = [];
+            
+            // Process each command
+            for (let i = 0; i < commands.length; i++) {
+                const cmd = commands[i];
+                const type = cmd.charAt(0);
+                const coords = cmd.substring(1).trim().split(/[\s,]+/).map(parseFloat);
+                
+                // Handle different command types
+                if (type === 'M' || type === 'L') {
+                    // Rotate point
+                    const rotated = rotatePoint(coords[0], coords[1], center.x, center.y, angle);
+                    newPathData.push(`${type}${rotated.x} ${rotated.y}`);
+                } else {
+                    // Keep commands that don't have explicit coordinates as-is
+                    newPathData.push(cmd);
+                }
+            }
+            
+            // Update the path data
+            pathElement.setAttribute('d', newPathData.join(' '));
+        }
+        
+        // Rotate a point around a center
+        function rotatePoint(x, y, centerX, centerY, angle) {
+            // Translate point to origin
+            const translatedX = x - centerX;
+            const translatedY = y - centerY;
+            
+            // Rotate point
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const rotatedX = translatedX * cos - translatedY * sin;
+            const rotatedY = translatedX * sin + translatedY * cos;
+            
+            // Translate back
+            return {
+                x: rotatedX + centerX,
+                y: rotatedY + centerY
+            };
+        }
+
+        // Update stroke width
+        function updateStrokeWidth() {
+            app.currentWidth = strokeWidthInput.value;
+            widthValueDisplay.textContent = `${app.currentWidth}px`;
+        }
+
+        // Update stroke color from color input
+        function updateStrokeColor() {
+            setStrokeColor(strokeColorInput.value);
+        }
+        
+        // Set stroke color and update UI
+        function setStrokeColor(color) {
+            app.currentColor = color;
+            strokeColorInput.value = color;
+            
+            // Update active swatch
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                if (swatch.getAttribute('data-color') === color) {
+                    swatch.classList.add('active');
+                } else {
+                    swatch.classList.remove('active');
+                }
+            });
+        }
+
+        // Update FPS setting using the slider
+        function setupFpsSlider() {
+            const fpsSlider = document.getElementById('fps-slider');
+            const fpsValue = document.querySelector('.fps-value');
+            
+            // Set initial value
+            fpsValue.textContent = app.fps + 'fps';
+            fpsSlider.value = app.fps;
+            
+            // Add event listener for slider changes
+            fpsSlider.addEventListener('input', function() {
+                app.fps = parseInt(this.value, 10);
+                fpsValue.textContent = app.fps + 'fps';
+                
+                // If animation is running, restart it with the new fps
+                if (app.animationInterval) {
+                    stopAnimation();
+                    playAnimation();
+                }
+            });
+        }
+
+        // Play the animation
+        function playAnimation() {
+            if (app.animationInterval) return; // Already playing
+            
+            // Flatten frames accounting for repeats
+            const flattenedFrames = [];
+            app.frames.forEach((frame, index) => {
+                const repeatCount = frame.repeatCount || 1;
+                for (let i = 0; i < repeatCount; i++) {
+                    flattenedFrames.push(index);
+                }
+            });
+            
+            let frameIndex = 0;
+            app.animationInterval = setInterval(() => {
+                selectFrame(flattenedFrames[frameIndex]);
+                frameIndex = (frameIndex + 1) % flattenedFrames.length;
+            }, 1000 / app.fps);
+        }
+
+        // Stop the animation
+        function stopAnimation() {
+            if (app.animationInterval) {
+                clearInterval(app.animationInterval);
+                app.animationInterval = null;
+            }
+        }
+
+        // Update onion skinning display
+        function updateOnionSkinning() {
+            // Remove previous onion skin if it exists
+            const existingOnionSkin = document.getElementById('onion-skin');
+            if (existingOnionSkin) {
+                existingOnionSkin.remove();
+            }
+            
+            // If onion skinning is enabled and there's a previous frame
+            if (app.onionSkinning && app.currentFrame > 0) {
+                const prevFrameIndex = app.currentFrame - 1;
+                const prevFrame = app.frames[prevFrameIndex];
+                
+                // Create a new group for the onion skin
+                const onionSkinGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                onionSkinGroup.id = 'onion-skin';
+                onionSkinGroup.setAttribute('opacity', '0.5'); // 50% transparent
+                
+                // Copy all paths from the previous frame
+                prevFrame.paths.forEach(pathData => {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', pathData.d);
+                    path.setAttribute('stroke', pathData.stroke);
+                    path.setAttribute('stroke-width', pathData['stroke-width']);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke-linecap', 'round');
+                    path.setAttribute('stroke-linejoin', 'round');
+                    path.setAttribute('pointer-events', 'none'); // Make it non-interactive
+                    onionSkinGroup.appendChild(path);
+                });
+                
+                // Add to canvas before the current frame's group
+                canvas.insertBefore(onionSkinGroup, app.frames[app.currentFrame].element);
+            }
+        }
+
+        // Update the position display in the status bar
+        function updatePosition(evt) {
+            const pos = getMousePosition(evt);
+            positionDisplay.textContent = `Position: ${Math.round(pos.x)},${Math.round(pos.y)}`;
+        }
+
+        // Update the frame count in the status bar
+        function updateFrameStatus() {
+            frameStatusDisplay.textContent = `Frame: ${app.currentFrame + 1}/${app.frames.length}`;
+        }
+
+        // Save the current frame as an SVG file
+        function saveFrameAsSVG() {
+            if (app.frames.length === 0) return;
+            
+            // Create a new SVG document
+            const svgDoc = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svgDoc.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            svgDoc.setAttribute('viewBox', `0 0 ${app.canvasWidth} ${app.canvasHeight}`);
+            svgDoc.setAttribute('width', app.canvasWidth);
+            svgDoc.setAttribute('height', app.canvasHeight);
+            
+            // Clone all the paths from the current frame
+            const frame = app.frames[app.currentFrame];
+            frame.paths.forEach(pathData => {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData.d);
+                path.setAttribute('stroke', pathData.stroke);
+                path.setAttribute('stroke-width', pathData['stroke-width']);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                svgDoc.appendChild(path);
+            });
+            
+            // Convert the SVG to a string
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svgDoc);
+            
+            // Create a Blob from the SVG string
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+            
+            // Create a URL for the Blob
+            const url = URL.createObjectURL(svgBlob);
+            
+            // Create a download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `frame-${app.currentFrame + 1}.svg`;
+            
+            // Append to the document, click it, and remove it
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Release the URL
+            URL.revokeObjectURL(url);
+        }
+        
+        // Save all frames as a ZIP file containing SVGs
+        function saveAllFrames() {
+            if (app.frames.length === 0) return;
+            
+            // Load JSZip library dynamically
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.onload = function() {
+                const zip = new JSZip();
+                
+                // Create SVG for each frame and add to zip
+                app.frames.forEach((frame, index) => {
+                    // Create a new SVG document for this frame
+                    const svgDoc = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svgDoc.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                    svgDoc.setAttribute('viewBox', `0 0 ${app.canvasWidth} ${app.canvasHeight}`);
+                    svgDoc.setAttribute('width', app.canvasWidth);
+                    svgDoc.setAttribute('height', app.canvasHeight);
+                    
+                    // Clone all the paths from the frame
+                    frame.paths.forEach(pathData => {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', pathData.d);
+                        path.setAttribute('stroke', pathData.stroke);
+                        path.setAttribute('stroke-width', pathData['stroke-width']);
+                        path.setAttribute('fill', 'none');
+                        path.setAttribute('stroke-linecap', 'round');
+                        path.setAttribute('stroke-linejoin', 'round');
+                        svgDoc.appendChild(path);
+                    });
+                    
+                    // Convert the SVG to a string
+                    const serializer = new XMLSerializer();
+                    const svgString = serializer.serializeToString(svgDoc);
+                    
+                    // Add SVG to the ZIP file with numbering
+                    const paddedIndex = String(index + 1).padStart(3, '0');
+                    zip.file(`frame-${paddedIndex}.svg`, svgString);
+                });
+                
+                // Generate the ZIP file
+                zip.generateAsync({type: "blob"})
+                    .then(function(content) {
+                        // Create a URL for the ZIP blob
+                        const url = URL.createObjectURL(content);
+                        
+                        // Create a download link
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'animation-frames.zip';
+                        
+                        // Append to the document, click it, and remove it
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Release the URL
+                        URL.revokeObjectURL(url);
+                    });
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // Load an SVG file into the current frame
+        function loadSVG(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    // Parse the SVG content
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(e.target.result, "image/svg+xml");
+                    
+                    // Check if it's a valid SVG
+                    if (svgDoc.documentElement.nodeName !== 'svg') {
+                        throw new Error('The file does not appear to be a valid SVG.');
+                    }
+                    
+                    // Get the current frame
+                    const frame = app.frames[app.currentFrame];
+                    
+                    // Clear the current frame
+                    clearCurrentFrame();
+                    
+                    // Get SVG dimensions
+                    let svgWidth = parseFloat(svgDoc.documentElement.getAttribute('width') || 
+                                             svgDoc.documentElement.viewBox.baseVal.width || 
+                                             app.canvasWidth);
+                    let svgHeight = parseFloat(svgDoc.documentElement.getAttribute('height') || 
+                                              svgDoc.documentElement.viewBox.baseVal.height || 
+                                              app.canvasHeight);
+                    
+                    // Calculate scale factor to make SVG fill 100% of the canvas height
+                    const scaleFactor = app.canvasHeight / svgHeight;
+                    
+                    // Process all path elements from the SVG
+                    const paths = svgDoc.documentElement.querySelectorAll('path');
+                    
+                    paths.forEach(path => {
+                        // Create a new path element
+                        const newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        
+                        // Copy the path data
+                        let pathData = path.getAttribute('d');
+                        
+                        // Get other attributes with fallbacks
+                        const stroke = path.getAttribute('stroke') || '#000000';
+                        const strokeWidth = parseFloat(path.getAttribute('stroke-width') || '1') * scaleFactor;
+                        const fill = path.getAttribute('fill') || 'none';
+                        
+                        // Set attributes for the new path
+                        newPath.setAttribute('d', pathData);
+                        newPath.setAttribute('stroke', stroke);
+                        newPath.setAttribute('stroke-width', strokeWidth);
+                        newPath.setAttribute('fill', fill === 'none' ? 'none' : 'transparent');
+                        newPath.setAttribute('stroke-linecap', 'round');
+                        newPath.setAttribute('stroke-linejoin', 'round');
+                        
+                        // If we need to scale, transform the path
+                        if (scaleFactor !== 1) {
+                            newPath.setAttribute('transform', `scale(${scaleFactor})`);
+                        }
+                        
+                        // Add to the current frame
+                        frame.element.appendChild(newPath);
+                        
+                        // Add to the frame's path list
+                        frame.paths.push({
+                            d: newPath.getAttribute('d'),
+                            stroke: newPath.getAttribute('stroke'),
+                            'stroke-width': newPath.getAttribute('stroke-width'),
+                            transform: scaleFactor !== 1 ? `scale(${scaleFactor})` : null
+                        });
+                    });
+                    
+                    // Update the thumbnail
+                    updateThumbnail();
+                    
+                    // Reset the file input
+                    svgFileInput.value = '';
+                    
+                } catch (error) {
+                    console.error('Error loading SVG:', error);
+                    alert('Failed to load the SVG file. The file may be corrupted or in an incompatible format.');
+                    
+                    // Reset the file input
+                    svgFileInput.value = '';
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Initialize the app when loaded
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
