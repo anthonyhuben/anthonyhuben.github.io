@@ -159,6 +159,328 @@
         </div>
     </section>
 
+    <!-- Upcoming Projects Section -->
+    <section id="upcoming-projects">
+        <div class="container">
+            <h2 class="section-title">Upcoming Projects</h2>
+
+            <div class="upcoming-projects-list">
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Page Turner</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Page Turner is a native macOS reader for source material that usually gets split across too many tools. It treats books, screenplay files, sheet music, archive-backed page sets, WebM and Matroska media, Photoshop documents, YAML collections, and 3D assets as first-class reading and viewing experiences inside one app.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/PageTurner.png" alt="Page Turner screenshot" loading="lazy">
+                            </div>
+
+                            <h4>What Makes PageTurner Different</h4>
+                            <ul>
+                                <li>One reader spans radically different formats. Page Turner handles ebooks, comics, scripts, scores, media, and model files without forcing each category into a separate app or browser tab.</li>
+                                <li>Large parts of the stack are native and self-contained. Page Turner includes its own ZIP read/write path, in-process archive extraction for RAR, 7z, and TAR variants, custom readers for Kindle, FB2, XPS, screenplay formats, MusicXML, YAML, and Photoshop, plus dedicated WebM and Matroska playback paths.</li>
+                                <li>Media features stay local. Video live captions run on-device after installing a Whisper Core ML model into the app, and current video frames can be captured directly to PNG.</li>
+                                <li>Folders and archives become readable books. Image folders, HTML folders, YAML folders, Flipper Zero animation assets, and many archive types are normalized into ordered page sequences.</li>
+                            </ul>
+
+                            <h4>What It Reads</h4>
+                            <ul>
+                                <li>Books and document formats: PDF, EPUB, MOBI, AZW, AZW4, FB2, XPS/OXPS, HTML, WebArchive, MHTML, RTF, RTFD, DOC, DOCX, Word XML, OpenDocument text, YAML, and PPT text extraction.</li>
+                                <li>Comics and page archives: CBZ, ZIP, ZIPX, CBR, RAR, CB7, 7z, CBT, TAR, <code>.tar.gz</code>, <code>.tar.bz2</code>, <code>.tar.xz</code>, <code>.tar.lzma</code>, <code>.tar.Z</code>, and the usual shorthand wrappers like <code>tgz</code>, <code>tbz2</code>, <code>txz</code>, <code>tlz</code>, and <code>taz</code>.</li>
+                                <li>Screenplays: Fountain, Final Draft FDX, Fade In, Celtx, ASTX, and Highland.</li>
+                                <li>Music and animated visual formats: MusicXML, MXL, APNG, GIF, PSD, PSB, YAML page collections, and Flipper Zero animation folders or ZIPs.</li>
+                                <li>Media and 3D: standard macOS audio and video formats, native WebM, Matroska video and audio (<code>.mkv</code>, <code>.mka</code>), and 3D assets such as USD, USDZ, OBJ, PLY, STL, SCN, DAE, and Alembic.</li>
+                            </ul>
+
+                            <h4>Reader Capabilities</h4>
+                            <ul>
+                                <li>Searchable bundled libraries for e-books, music scores, and E. E. Cummings poem collections.</li>
+                                <li>Reader themes, bundled fonts, dark mode, and a switch to respect original document fonts.</li>
+                                <li>Read-aloud using macOS speech voices with adjustable rate, pitch, volume, and voice selection.</li>
+                                <li>Built-in MusicXML playback through a native MIDI timeline audio synthesizer.</li>
+                                <li>Native WebM and Matroska playback, local live captions, volume controls, and frame capture.</li>
+                                <li>Native 3D preview with orbit controls, rotation shortcuts, and zoom.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Seamless Clip</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Seamless Clip is a macOS clip editor built around one idea: trimming and rearranging video should stay as close to the original media as possible, especially for files most desktop editors still treat as second-class citizens.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/SeamlessClip.png" alt="Seamless Clip screenshot" loading="lazy">
+                            </div>
+
+                            <h4>What Makes Seamless Clip Different</h4>
+
+                            <h5>Native Matroska and WebM handling</h5>
+                            <p>Seamless Clip does not treat <code>mkv</code> and <code>webm</code> as awkward imports that must be transcoded before anything useful can happen. It has native Matroska/WebM parsing, native VP9 playback paths, native keyframe discovery, native waveform fallback, native thumbnail generation fallback, and native lossless segment export for supported Matroska/WebM sources.</p>
+                            <p>That matters because the app can work directly with containers and codecs that are usually pushed through a conversion step first.</p>
+
+                            <h5>Lossless export is the default mindset</h5>
+                            <p>For regular AVFoundation-compatible media, Seamless Clip uses passthrough export whenever possible. For Matroska/WebM sources it can build new container output directly from the original packet structure instead of re-encoding the whole file.</p>
+                            <p>The result is an editor aimed at making cuts without turning every export into a quality tradeoff.</p>
+
+                            <h5>One timeline, multiple ways to read the footage</h5>
+                            <p>The timeline is not just a bar with in/out points. It can layer:</p>
+                            <ul>
+                                <li>waveform bands</li>
+                                <li>frame-strip thumbnails</li>
+                                <li>keyframe markers</li>
+                                <li>hover time inspection</li>
+                                <li>zoomed and overview navigation</li>
+                            </ul>
+                            <p>This gives you visual, audio, and codec-structure context in the same editing surface, which is unusually useful for finding clean cut points quickly.</p>
+
+                            <h5>Keyframe-aware navigation for precise cuts</h5>
+                            <p>Seamless Clip supports:</p>
+                            <ul>
+                                <li>frame stepping</li>
+                                <li>keyframe stepping</li>
+                                <li>direct timecode seek</li>
+                                <li>segment looping</li>
+                                <li>1-second and 5-second jumps</li>
+                                <li>jump-to-start/end controls</li>
+                            </ul>
+                            <p>That combination makes it feel closer to a focused clip bench than a simplified consumer trimmer.</p>
+
+                            <h5>Segments and markers live in the same workflow</h5>
+                            <p>A timeline item can be a true clip or a zero-duration marker. You can switch between those modes, rename items, tag them, duplicate them, bulk-select them, filter by type, search by label/tag, and invert clip selections into the gaps between segments.</p>
+                            <p>That makes Seamless Clip useful not just for cutting media, but for logging and shaping a rough edit structure before export.</p>
+
+                            <h5>Stream-aware export</h5>
+                            <p>Seamless Clip exposes video, audio, and subtitle streams as selectable export targets. Instead of exporting whatever tracks happen to survive a generic pipeline, you can explicitly decide which streams travel with the result.</p>
+                            <p>This is especially important for multi-track sources where the container layout is part of the asset, not accidental metadata.</p>
+
+                            <h5>Practical output beyond video files</h5>
+                            <p>The same segment data can be exported as:</p>
+                            <ul>
+                                <li>clip output media</li>
+                                <li>segment CSV</li>
+                                <li>YouTube chapter text</li>
+                                <li>captured PNG stills from the current frame</li>
+                            </ul>
+                            <p>It also imports segments from CSV, so the app can move between logging, editing, and publishing workflows instead of trapping decisions inside one UI.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Video Grid</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Video Grid is a macOS app that turns a video into a clean thumbnail sheet you can save and share. Open a video, let the app pull frames from across the timeline, adjust the look if you want, and export a finished image.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/VideoGrid.png" alt="Video Grid screenshot" loading="lazy">
+                            </div>
+                            <p>It is built for people who need a fast visual summary of a video: editors, archivists, reviewers, researchers, collectors, and anyone making contact sheets.</p>
+
+                            <h4>What Makes Video Grid Unique?</h4>
+                            <p>Most thumbnail tools stop at "grab some frames." Video Grid goes further:</p>
+                            <ul>
+                                <li>It keeps everything local on your Mac. Your video is not uploaded to a server.</li>
+                                <li>It makes a finished contact sheet, not just a folder of random stills.</li>
+                                <li>It shows useful video details in the header, including resolution, runtime, frame rate, codec, bitrate, and file size.</li>
+                                <li>It lets you fix individual frames after generation, so you are not stuck with the first automatic result.</li>
+                                <li>It includes built-in style presets, font selection, timestamp controls, and color controls, so the export looks presentable without extra editing.</li>
+                                <li>It supports common formats and also handles MKV and WebM well, which many lightweight tools ignore.</li>
+                            </ul>
+                            <p>In short: Video Grid is meant to produce something you can actually use, not just something technically extracted.</p>
+
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Open a video file or drag one in from Finder</li>
+                                <li>Generate a grid of evenly spaced thumbnails</li>
+                                <li>Choose how many rows and columns you want</li>
+                                <li>Change the output scale to balance detail and file size</li>
+                                <li>Rename the title shown on the exported sheet</li>
+                                <li>Apply built-in color presets or pick your own colors</li>
+                                <li>Choose a font from your system fonts</li>
+                                <li>Show or hide timestamps</li>
+                                <li>Add rounded corners and adjust spacing</li>
+                                <li>Fine-tune any thumbnail by choosing a better moment</li>
+                                <li>Add custom text to individual frames</li>
+                                <li>Reorder thumbnails by dragging them</li>
+                                <li>Export as PNG, JPEG, or HEIC</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Video Crosshatch</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>VideoCrosshatch is a macOS app for turning ordinary video into stylized, graphic-looking motion. You can preview a single processed frame, adjust the look until it feels right, then export the full result as a video, image sequence, or animated PNG.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/VideoCrosshatch.png" alt="Video Crosshatch screenshot" loading="lazy">
+                            </div>
+
+                            <h4>What Makes VideoCrosshatch Unique?</h4>
+                            <p>Most video stylizing tools make you guess, export, wait, and repeat. VideoCrosshatch is built around a faster workflow:</p>
+                            <ul>
+                                <li>You can scrub to any frame and generate a one-frame preview before committing to a full export.</li>
+                                <li>It combines visual effects, color treatments, and audio effects in one app instead of making you jump between tools.</li>
+                                <li>It includes built-in cleanup tools like black bar removal, reframing presets, and optional AI interpolation/upscaling.</li>
+                                <li>It feels like a native Mac app, not a collection of scripts.</li>
+                            </ul>
+                            <p>In practice, that means you can experiment quickly and make creative decisions with much less waiting.</p>
+
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Apply 50+ stylized video looks, including crosshatch, sketch, dot-matrix, contour, woodcut, radial, and more experimental patterns</li>
+                                <li>Add audio treatments such as voice cleanup, loudness normalization, lo-fi, robotic, reverb, and other character effects</li>
+                                <li>Tint the final image with color filters</li>
+                                <li>Remove horizontal or vertical black bars automatically</li>
+                                <li>Reframe exports for original, square, widescreen, or TikTok-style vertical output</li>
+                                <li>Export a full movie, an image sequence, or an animated PNG</li>
+                                <li>Download web video in the app's separate Video Downloader mode</li>
+                            </ul>
+
+                            <h4>How It Works</h4>
+                            <ol>
+                                <li>Open a video.</li>
+                                <li>Scrub to a frame you care about.</li>
+                                <li>Click <strong>Generate Preview</strong>.</li>
+                                <li>Adjust the effect, color, audio, and export settings.</li>
+                                <li>Export when you're happy with the preview.</li>
+                            </ol>
+                            <p>This preview-first workflow is the main reason the app is fast to use creatively.</p>
+
+                            <h4>Main Features</h4>
+
+                            <h5>Video Filter mode</h5>
+                            <p>This is the main editing mode. It gives you:</p>
+                            <ul>
+                                <li>side-by-side source and preview panels</li>
+                                <li>searchable effect pickers</li>
+                                <li>audio effect controls</li>
+                                <li>brightness, saturation, contrast, and sharpness controls</li>
+                                <li>frame range export</li>
+                                <li>frame interpolation</li>
+                                <li>AI upscaling</li>
+                                <li>export progress with FPS and time remaining</li>
+                            </ul>
+
+                            <h5>Video Downloader mode</h5>
+                            <p>If you want to save video from supported sites, the app also includes a downloader mode with optional audio-only export and format conversion.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Scrupulous</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Scrupulous is a native macOS writing app for people who want a clean drafting tool without giving up structure, preview, or print control. It works with both Markdown and Fountain, so you can write notes, long-form documents, and screenplays in one place.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/Scrupulous.png" alt="Scrupulous screenshot" loading="lazy">
+                            </div>
+                            <p>The app is built around a simple idea: plain-text writing should still feel serious, polished, and pleasant to use.</p>
+
+                            <h4>What Makes Scrupulous Unique?</h4>
+                            <p>Most writing apps make you choose between a plain-text editor, a screenplay tool, and a heavy document app. Scrupulous sits in the middle.</p>
+                            <ul>
+                                <li>It is a real Mac app, not a web app in a wrapper. Opening files, saving, printing, fonts, window behavior, and text editing are native.</li>
+                                <li>It supports both Markdown and Fountain. You can write structured prose and screenplays without switching to a different application.</li>
+                                <li>It gives you a live page-style preview while you write. Your draft stays in plain text, but you can instantly see it as a screenplay, manuscript, novel page, MLA report, or plain text printout.</li>
+                                <li>It includes <code>/Quick Reference</code>, a built-in side panel for short answers, definitions, wording help, and writing nudges. When available, it uses Apple's on-device language model instead of sending your request to a website.</li>
+                                <li>It keeps the editor useful for long documents. You get a live navigator, screenplay-aware statistics, PDF export, print support, and theme customization without turning the app into a cluttered word processor.</li>
+                            </ul>
+                            <p>In short: Scrupulous is for writers who like the simplicity of plain text but still want the feeling of a dedicated writing studio.</p>
+
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Create, open, and save <code>.md</code> and <code>.fountain</code> files</li>
+                                <li>Switch between writing view and preview view</li>
+                                <li>Use document templates such as Modern Standard, Screenplay, Manuscript, Novel, MLA Report, and Plain Text</li>
+                                <li>Print your document or export it as a PDF</li>
+                                <li>Use a live navigator to jump through headings, sections, and scenes</li>
+                                <li>View live statistics such as word count, estimated pages, scene counts, and dialogue distribution</li>
+                                <li>Customize the app's color theme</li>
+                                <li>Use inline formatting commands for common Markdown and Fountain actions</li>
+                            </ul>
+
+                            <h4>Why Writers May Like It</h4>
+                            <ul>
+                                <li>Plain text stays at the center, so your files remain readable and portable</li>
+                                <li>Screenplay writing is treated as a first-class mode, not an afterthought</li>
+                                <li>Preview is built for page rhythm and print layout, not just styled text on a screen</li>
+                                <li>The interface stays focused instead of feeling like a general-purpose office suite</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Reader Bot</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Reader Bot is a macOS app that turns text into natural-sounding speech using Piper voice models.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/ReaderBot.png" alt="Reader Bot screenshot" loading="lazy">
+                            </div>
+                            <p>The important part: it runs on your Mac, not in the cloud. You can paste in text, choose a voice, listen immediately, and export the result as a <code>.wav</code> file.</p>
+
+                            <h4>What Makes Reader Bot Unique</h4>
+                            <p>Most text-to-speech apps are built around one of two ideas:</p>
+                            <ul>
+                                <li>use the system voices that come with your device</li>
+                                <li>send your text to an online service</li>
+                            </ul>
+                            <p>Reader Bot takes a different approach.</p>
+                            <ul>
+                                <li>It uses local Piper voices, so your text can stay on your machine.</li>
+                                <li>It gives you direct control over the voice model instead of hiding everything behind one Play button.</li>
+                                <li>It supports multi-speaker voice models, so some voices let you switch between different speaker tracks.</li>
+                                <li>It can export speech as audio, which makes it useful for drafts, voiceovers, and accessibility workflows.</li>
+                            </ul>
+                            <p>In short: Reader Bot is for people who want more control and more privacy than a typical reader app.</p>
+
+                            <h4>What You Can Do</h4>
+                            <ul>
+                                <li>Paste or type text and hear it read aloud</li>
+                                <li>Choose from installed Piper voices</li>
+                                <li>Adjust voice behavior with settings like noise, length, and volume</li>
+                                <li>Switch speakers when a voice model supports more than one</li>
+                                <li>Save generated speech as a <code>.wav</code> file</li>
+                            </ul>
+
+                            <h4>Who It Is For</h4>
+                            <p>Reader Bot is a good fit if you want to:</p>
+                            <ul>
+                                <li>listen to writing drafts out loud</li>
+                                <li>preview Piper voices on macOS</li>
+                                <li>create local voice clips without using a web service</li>
+                                <li>keep sensitive text off third-party servers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <!-- Work / Portfolio Section -->
     <section id="work">
         <div class="container">
