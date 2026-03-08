@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Scroll reveal animations ---
     const revealElements = document.querySelectorAll(
-        '.about-grid, .project-card, .github-card, .timeline-item, .education-card, .contact-card'
+        '.about-grid, .upcoming-card, .project-card, .github-card, .timeline-item, .education-card, .contact-card'
     );
 
     revealElements.forEach(el => el.classList.add('reveal'));
