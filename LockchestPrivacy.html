@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lockchest Privacy Policy | Anthony James Huben</title>
+    <meta name="description" content="Privacy policy for Lockchest. Password generation, history, and exports stay local on your Mac, with no analytics, no account, and no server uploads.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .privacy-page {
+            padding: 132px 0 96px;
+        }
+
+        .privacy-hero {
+            margin-bottom: 32px;
+        }
+
+        .privacy-kicker {
+            text-align: center;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .privacy-intro {
+            max-width: 780px;
+            margin: 0 auto 28px;
+            text-align: center;
+            color: var(--gray);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .privacy-actions {
+            justify-content: center;
+        }
+
+        .privacy-card {
+            overflow: hidden;
+        }
+
+        .privacy-content {
+            padding: 32px;
+        }
+
+        .privacy-section + .privacy-section {
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(168, 230, 207, 0.18);
+        }
+
+        .privacy-section h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--mid);
+            margin-bottom: 10px;
+        }
+
+        .privacy-section p {
+            color: var(--gray);
+            margin-bottom: 0;
+        }
+
+        .privacy-section p + p {
+            margin-top: 12px;
+        }
+
+        .privacy-updated {
+            margin-top: 12px;
+            font-size: 0.92rem;
+            color: var(--light-gray);
+        }
+
+        @media (max-width: 768px) {
+            .privacy-page {
+                padding-top: 116px;
+            }
+
+            .privacy-content {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="privacy-page">
+        <section class="privacy-hero" id="overview">
+            <div class="container">
+                <p class="privacy-kicker">Lockchest</p>
+                <h1 class="section-title">Privacy Policy</h1>
+                <p class="privacy-intro">
+                    Lockchest is built to keep password generation and vault management on your Mac. The app does not collect analytics, sell your data, or upload your passwords to a server. Passwords are generated locally, and any saved history stays on your device unless you choose to export it.
+                </p>
+                <div class="project-links privacy-actions">
+                    <a href="index.html" class="project-link">Back to homepage</a>
+                    <a href="#generation" class="project-link">Generation</a>
+                    <a href="#storage" class="project-link">Storage</a>
+                    <a href="#authentication" class="project-link">Authentication</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="policy-details">
+            <div class="container">
+                <article class="upcoming-card privacy-card">
+                    <div class="upcoming-content privacy-content">
+                        <section class="privacy-section" id="tracking">
+                            <h2>What We Do Not Track</h2>
+                            <p>Lockchest does not track your browsing activity, collect usage analytics, build advertising profiles, or send password data to remote services.</p>
+                        </section>
+
+                        <section class="privacy-section" id="generation">
+                            <h2>Local Password Generation</h2>
+                            <p>When you generate passwords, Lockchest performs that work locally on your Mac. The app uses on-device randomness and does not need to contact a server to create passwords, calculate strength, or show generation results.</p>
+                            <p>The passwords you generate remain on your device unless you copy them, save them, or export them yourself.</p>
+                        </section>
+
+                        <section class="privacy-section" id="storage">
+                            <h2>Saved Passwords and Settings</h2>
+                            <p>Lockchest stores your preferences and saved password history locally using macOS app storage. That includes options such as character set choices, advanced generation settings, and locally saved history entries.</p>
+                            <p>If you enable auto-save, generated passwords are written to local storage on your Mac so you can view them later in the app. You can clear that history from within the app at any time.</p>
+                        </section>
+
+                        <section class="privacy-section" id="export">
+                            <h2>Clipboard, Import, and Export</h2>
+                            <p>Copying a password places it on your Mac clipboard so you can paste it into another app or website. Lockchest does not transmit clipboard contents to a server.</p>
+                            <p>If you export passwords, the app writes a CSV file to the location you choose. If you import passwords, the app reads the CSV file you select. Those file operations stay on your Mac and only use the files you explicitly choose.</p>
+                        </section>
+
+                        <section class="privacy-section" id="authentication">
+                            <h2>macOS Authentication</h2>
+                            <p>When you switch to the managed-password view, Lockchest uses macOS device authentication such as Touch ID or your Mac password to unlock locally stored entries. Authentication is handled by macOS, and the app does not receive your biometric data or password.</p>
+                        </section>
+
+                        <section class="privacy-section" id="sharing">
+                            <h2>Sharing and Analytics</h2>
+                            <p>Because Lockchest does not collect your data, there is nothing to sell, rent, or share for analytics or advertising purposes.</p>
+                        </section>
+
+                        <section class="privacy-section" id="updates">
+                            <h2>Updates to This Policy</h2>
+                            <p>If this policy changes, the updated version will appear on this page.</p>
+                            <p>If you have questions, use the <a href="index.html#contact">homepage contact information</a>.</p>
+                            <p class="privacy-updated">Last updated: April 4, 2026.</p>
+                        </section>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Anthony James Huben. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
