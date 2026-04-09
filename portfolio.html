@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthony James Huben | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">Burning Pencils Productions</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="writing.html">Writing</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-right">
+                <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <button class="nav-toggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-hero">
+        <div class="container">
+            <div class="page-hero-card">
+                <span class="page-hero-eyebrow">Screen</span>
+                <h1>Portfolio</h1>
+                <p>Selected films, podcast work, and character design studies collected on one focused page.</p>
+                <div class="hero-actions">
+                    <a href="#work" class="project-link">Films</a>
+                    <a href="#art" class="project-link">Character design</a>
+                    <a href="writing.html" class="project-link">Writing</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="work">
+        <div class="container">
+            <h2 class="section-title">Selected Work</h2>
+            <p class="section-intro">A selection of animation, live-action, and non-fiction projects.</p>
+
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="featured">Featured</button>
+                <button class="filter-btn" data-filter="animation">Animation</button>
+                <button class="filter-btn" data-filter="live-action">Live Action</button>
+                <button class="filter-btn" data-filter="non-fiction">Non-Fiction</button>
+            </div>
+
+            <div class="project-grid">
+                <div class="project-card featured animation" data-category="featured animation" id="work-through-the-fire">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/ai1CvtuMQSU" title="Through The Fire" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Animated Drama</span>
+                        <h3>Through The Fire</h3>
+                        <p>A 6-minute animated proof of concept about a mother whose van home goes up in flames and forces a custody fight.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Director, Writer, and Animator</p>
+                        <p class="project-meta">Loyola Marymount University &bull; May 2025</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=ai1CvtuMQSU" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                        <div class="project-docs">
+                            <span class="docs-label">Production Documents:</span>
+                            <a href="production_documents/Through_The_Fire_Animation_Style_Guide.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Animation Style Guide</a>
+                            <a href="production_documents/Through_The_Fire_Lookbook.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Lookbook</a>
+                            <a href="production_documents/Through_The_Fire_Music_Notes.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Music Notes</a>
+                            <a href="production_documents/Through_The_Fire_Post-Production_Schedule.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Post-Production Schedule</a>
+                            <a href="production_documents/Through_The_Fire_Shot_List_Early_Draft.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Shot List</a>
+                            <a href="production_documents/Through_The_Fire_Shooting_Script.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Shooting Script</a>
+                            <a href="production_documents/Through_The_Fire_Sound_Spotting.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Sound Spotting</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card featured live-action" data-category="featured live-action" id="work-throwaway-character">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/-GOhgD2Fbaw" title="Throwaway Character" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Relationship Drama</span>
+                        <h3>Throwaway Character</h3>
+                        <p>A two-minute proof of concept where a marriage proposal goes awry when secrets surface.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Director, Writer, and Editor</p>
+                        <p class="project-meta">Loyola Marymount University &bull; Dec 2022</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=-GOhgD2Fbaw" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                        <div class="project-docs">
+                            <span class="docs-label">Production Documents:</span>
+                            <a href="production_documents/Throwaway_Character_Call_Sheet.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Call Sheet</a>
+                            <a href="production_documents/Throwaway_Character_Shooting_Script.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Shooting Script</a>
+                            <a href="production_documents/Throwaway_Character_Prop_&_Costume_Breakdown.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Prop &amp; Costume Breakdown</a>
+                            <a href="production_documents/Throwaway_Character_Shot_List.pdf" target="_blank" rel="noopener noreferrer" class="doc-tag">Shot List</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card live-action" data-category="live-action" id="work-bring-on-the-night">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/vTN1OaZBPvk" title="Bring on the Night" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Live Action</span>
+                        <h3>Bring on the Night</h3>
+                        <p>A live-action short with a writer-director-editor workflow.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Director, Writer, Editor</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=vTN1OaZBPvk" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card live-action" data-category="live-action" id="work-falsus-sequentia">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/z35zXyOH3mY" title="Falsus Sequentia" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Live Action</span>
+                        <h3>Falsus Sequentia</h3>
+                        <p>A compact narrative project in the same producer-director-writer-editor lane.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Director, Writer, Editor</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=z35zXyOH3mY" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card non-fiction" data-category="non-fiction" id="work-frustrations-writer">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/NBLpdEb50GM" title="The Frustrations of Being a Writer" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Non-Fiction</span>
+                        <h3>The Frustrations of Being a Writer</h3>
+                        <p>A non-fiction piece focused on writing, editing, and structure.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Editor</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=NBLpdEb50GM" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card non-fiction" data-category="non-fiction" id="work-daughters-fathers">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/rIBJPRL0594" title="Daughters and their Fathers Intro" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Podcast</span>
+                        <h3>Daughters and their Fathers: It's Complicated</h3>
+                        <p>Edited interviews, mixed audio, and created the opening sequence for the podcast series.</p>
+                        <p class="project-role"><strong>Role:</strong> Podcast Editor</p>
+                        <p class="project-meta">Patricia K Meyer Productions &bull; Dec 2024 &ndash; Nov 2025</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=rIBJPRL0594" target="_blank" rel="noopener noreferrer" class="project-link">Watch the Intro</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card animation" data-category="animation" id="work-dragons-egg">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/HAAq2vkX1ZI" title="Dragon's Egg" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Animation</span>
+                        <h3>Dragon's Egg</h3>
+                        <p class="project-role"><strong>Role:</strong> Animator, Writer, Editor</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=HAAq2vkX1ZI" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card animation live-action" data-category="animation live-action" id="work-brainmax">
+                    <div class="project-video">
+                        <iframe src="https://www.youtube.com/embed/jygV6764IAc" title="Brainmax" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-tag">Live Action / Animation</span>
+                        <h3>Brainmax</h3>
+                        <p>A live-action reimagining of Regular Show.</p>
+                        <p class="project-role"><strong>Role:</strong> Producer, Director, Writer, Editor</p>
+                        <div class="project-links">
+                            <a href="https://www.youtube.com/watch?v=jygV6764IAc" target="_blank" rel="noopener noreferrer" class="project-link">Watch on YouTube</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="art">
+        <div class="container">
+            <h2 class="section-title">Character Design</h2>
+            <p class="section-intro">Original character artwork and visual development for animation projects.</p>
+
+            <div class="art-grid">
+                <div class="art-card">
+                    <div class="art-image-wrapper">
+                        <img src="Design_1.1.webp" alt="Becka Character Design - Angel Wings Turnaround" loading="lazy">
+                    </div>
+                    <div class="art-info">
+                        <h3>Becka – Character Turnaround</h3>
+                        <p>A turnaround for Becka from <em>The Date From Hell</em>, showing her angelic look and hidden demonic nature.</p>
+                    </div>
+                </div>
+
+                <div class="art-card">
+                    <div class="art-image-wrapper">
+                        <img src="Design_1.2.webp" alt="Becka Expression Sheet" loading="lazy">
+                    </div>
+                    <div class="art-info">
+                        <h3>Becka – Expression Sheet</h3>
+                        <p>Six expressions capturing Becka's emotional range and character consistency.</p>
+                    </div>
+                </div>
+
+                <div class="art-card">
+                    <div class="art-image-wrapper">
+                        <img src="Design_2.webp" alt="The Replacements - Character Design with Bunny Ears" loading="lazy">
+                    </div>
+                    <div class="art-info">
+                        <h3>The Replacements – Character Study</h3>
+                        <p>A modular puppet-style figure with a moody background and body-horror undertones.</p>
+                    </div>
+                </div>
+
+                <div class="art-card">
+                    <div class="art-image-wrapper">
+                        <img src="Design_3.webp" alt="Luna Character Design - Front and Back Views" loading="lazy">
+                    </div>
+                    <div class="art-info">
+                        <h3>Luna – Front &amp; Back View</h3>
+                        <p>Complete turnaround of Luna, with soft blue costume details and a grounded palette.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Anthony James Huben. All rights reserved.</p>
+            <div class="project-links" style="justify-content:center; margin-top: 16px;">
+                <a href="LockchestPrivacy.html" class="project-link">Lockchest Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

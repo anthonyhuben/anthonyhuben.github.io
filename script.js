@@ -1,135 +1,150 @@
-// ============================================
-// Anthony James Huben — Portfolio Scripts
-// ============================================
+// Shared behavior for the multi-page portfolio
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- Dark mode toggle ---
-    const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const body = document.body;
-
-    // Check for saved dark mode preference, default to enabled
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode !== 'disabled') {
-        body.classList.add('dark-mode');
-    }
-
-    darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-
-        // Save preference
-        if (body.classList.contains('dark-mode')) {
-            localStorage.setItem('darkMode', 'enabled');
-        } else {
-            localStorage.setItem('darkMode', null);
-        }
-    });
-
-    // --- Navbar scroll effect ---
     const navbar = document.getElementById('navbar');
-    const handleScroll = () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    // --- Mobile nav toggle ---
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
 
-    navToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('open');
-        navToggle.classList.toggle('active');
-    });
+    const normalizePath = (pathname) => {
+        const trimmed = pathname.replace(/\/+$/, '');
+        if (!trimmed) {
+            return 'index.html';
+        }
 
-    // Close mobile nav on link click
-    navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('open');
-            navToggle.classList.remove('active');
-        });
-    });
-
-    // --- Active nav link on scroll ---
-    const sections = document.querySelectorAll('section[id]');
-
-    const updateActiveLink = () => {
-        const scrollPos = window.scrollY + 100;
-
-        sections.forEach(section => {
-            const top = section.offsetTop;
-            const height = section.offsetHeight;
-            const id = section.getAttribute('id');
-            const link = document.querySelector(`.nav-links a[href="#${id}"]`);
-
-            if (link) {
-                if (scrollPos >= top && scrollPos < top + height) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            }
-        });
+        const fileName = trimmed.split('/').pop();
+        return fileName || 'index.html';
     };
 
-    window.addEventListener('scroll', updateActiveLink, { passive: true });
+    const setDarkMode = (enabled) => {
+        body.classList.toggle('dark-mode', enabled);
+        localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
 
-    // --- Portfolio filter ---
+        if (darkModeToggle) {
+            darkModeToggle.setAttribute('aria-pressed', String(enabled));
+        }
+    };
+
+    if (localStorage.getItem('darkMode') !== 'disabled') {
+        body.classList.add('dark-mode');
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.setAttribute('aria-pressed', String(body.classList.contains('dark-mode')));
+        darkModeToggle.addEventListener('click', () => {
+            setDarkMode(!body.classList.contains('dark-mode'));
+        });
+    }
+
+    if (navbar) {
+        const handleScroll = () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        };
+
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    if (navToggle && navLinks) {
+        navToggle.setAttribute('aria-expanded', 'false');
+
+        navToggle.addEventListener('click', () => {
+            const isOpen = navLinks.classList.toggle('open');
+            navToggle.classList.toggle('active', isOpen);
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        navLinks.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+                navToggle.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+
+    const currentPage = normalizePath(window.location.pathname);
+
+    document.querySelectorAll('.nav-links a').forEach((link) => {
+        const href = link.getAttribute('href');
+        if (!href) {
+            return;
+        }
+
+        const linkPath = normalizePath(new URL(href, window.location.href).pathname);
+        const isActive = linkPath === currentPage;
+
+        if (isActive) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.classList.remove('active');
+            link.removeAttribute('aria-current');
+        }
+    });
+
     const filterBtns = document.querySelectorAll('.filter-btn');
     const projectCards = document.querySelectorAll('.project-card');
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update active button
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    if (filterBtns.length && projectCards.length) {
+        filterBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach((button) => button.classList.remove('active'));
+                btn.classList.add('active');
 
-            const filter = btn.getAttribute('data-filter');
+                const filter = btn.getAttribute('data-filter');
 
-            projectCards.forEach(card => {
-                if (filter === 'all') {
-                    card.classList.remove('hidden');
-                } else {
-                    const categories = card.getAttribute('data-category');
-                    if (categories && categories.includes(filter)) {
+                projectCards.forEach((card) => {
+                    if (filter === 'all') {
+                        card.classList.remove('hidden');
+                        return;
+                    }
+
+                    const categories = card.getAttribute('data-category') || '';
+                    if (categories.includes(filter)) {
                         card.classList.remove('hidden');
                     } else {
                         card.classList.add('hidden');
                     }
-                }
+                });
             });
         });
-    });
+    }
 
-    // --- Scroll reveal animations ---
     const revealElements = document.querySelectorAll(
-        '.about-grid, .upcoming-card, .project-card, .github-card, .timeline-item, .education-card, .contact-card'
+        '.page-card, .page-hero-card, .about-grid, .upcoming-card, .project-card, .github-card, .timeline-item, .education-card, .contact-card, .art-card, .article-card'
     );
 
-    revealElements.forEach(el => el.classList.add('reveal'));
+    revealElements.forEach((element) => element.classList.add('reveal'));
 
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                revealObserver.unobserve(entry.target);
-            }
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px',
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -40px 0px'
-    });
 
-    revealElements.forEach(el => revealObserver.observe(el));
+        revealElements.forEach((element) => revealObserver.observe(element));
+    } else {
+        revealElements.forEach((element) => element.classList.add('visible'));
+    }
 
-
-    // --- Smooth scroll for hero CTA ---
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', (e) => {
-            e.preventDefault();
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', (event) => {
             const target = document.querySelector(anchor.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+            if (!target) {
+                return;
             }
+
+            event.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
         });
     });
 });

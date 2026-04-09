@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthony James Huben | Projects</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">Burning Pencils Productions</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="writing.html">Writing</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-right">
+                <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <button class="nav-toggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-hero">
+        <div class="container">
+            <div class="page-hero-card">
+                <span class="page-hero-eyebrow">Build</span>
+                <h1>Projects</h1>
+                <p>Upcoming macOS apps and browser-based tools, grouped together so the homepage can stay focused.</p>
+                <div class="hero-actions">
+                    <a href="#github" class="project-link">GitHub tools</a>
+                    <a href="portfolio.html" class="project-link">Portfolio</a>
+                    <a href="contact.html" class="project-link">Contact</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="upcoming-projects">
+        <div class="container">
+            <h2 class="section-title">Upcoming Projects</h2>
+            <p class="section-intro">Native macOS apps in progress, from reading and editing to writing and media workflows.</p>
+
+            <div class="upcoming-projects-list">
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Page Turner</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Page Turner is a native macOS reader for books, scripts, scores, archives, media, and 3D assets. It keeps different formats readable in one place instead of scattering them across separate apps.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/PageTurner.png" alt="Page Turner screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>Local archive and page-set reading</li>
+                                <li>Reader themes, fonts, and read-aloud</li>
+                                <li>Media and 3D assets stay local</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="PageTurnerPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Seamless Clip</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Seamless Clip is a macOS clip editor built around lossless trimming and a more faithful workflow for Matroska and WebM files.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/SeamlessClip.png" alt="Seamless Clip screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>Native Matroska/WebM handling</li>
+                                <li>Stream-aware export and segment logs</li>
+                                <li>Built for clean, local editing</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="SeamlessClipPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Video Grid</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Video Grid turns a video into a finished thumbnail sheet you can save, share, and customize locally on your Mac.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/VideoGrid.png" alt="Video Grid screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>Thumbnail sheets from any video</li>
+                                <li>Adjustable rows, columns, and styling</li>
+                                <li>PNG, JPEG, and HEIC export</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="VideoMatrixPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Video Crosshatch</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>VideoCrosshatch stylizes ordinary video into graphic motion with a preview-first workflow for quick creative iteration.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/VideoCrosshatch.png" alt="Video Crosshatch screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>50+ stylized looks</li>
+                                <li>Audio treatment and cleanup tools</li>
+                                <li>Video, image sequence, and APNG export</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="VideoMatrixPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Scrupulous</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Scrupulous is a native Mac writing app for Markdown and Fountain, with live preview, templates, and a focused writing workflow.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/Scrupulous.png" alt="Scrupulous screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>Markdown and Fountain support</li>
+                                <li>Live page-style preview</li>
+                                <li>PDF and print output</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="ScrupulousPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="upcoming-card">
+                    <div class="upcoming-content">
+                        <div class="upcoming-header">
+                            <span class="project-tag">Upcoming App</span>
+                            <h3>Reader Bot</h3>
+                        </div>
+                        <div class="upcoming-prose">
+                            <p>Reader Bot turns text into natural-sounding speech with local Piper voices and a privacy-first workflow.</p>
+                            <div class="upcoming-media">
+                                <img src="Projects/ReaderBot.png" alt="Reader Bot screenshot" loading="lazy">
+                            </div>
+                            <ul>
+                                <li>Local voice models</li>
+                                <li>Multi-speaker support</li>
+                                <li>Export speech as WAV</li>
+                            </ul>
+                            <div class="project-links">
+                                <a href="ReaderBotPrivacy.html" class="project-link">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="github">
+        <div class="container">
+            <h2 class="section-title">GitHub Projects</h2>
+            <p class="section-intro">Small browser-based tools that are ready to try immediately.</p>
+
+            <div class="github-grid">
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="7" x2="22" y2="7"/><line x1="2" y1="17" x2="22" y2="17"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>4k-Storyboarder</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 2</span></div>
+                    </div>
+                    <p class="github-description">Create frame-by-frame animations right in your browser.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="4K-Storyboarder.html" class="github-link try-it">Try It Now</a>
+                        <a href="https://github.com/anthonyhuben/4k-Storyboarder" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>VideoFrameCompare</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 1</span></div>
+                    </div>
+                    <p class="github-description">Compare frames of a video side by side.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="VideoFrameCompare.html" class="github-link try-it">Try It Now</a>
+                        <a href="https://github.com/anthonyhuben/VideoFrameCompare" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>ColorHarmonyAnalysis</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 1</span></div>
+                    </div>
+                    <p class="github-description">Discover and harmonize colors from PNG images.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="ColorHarmonyAnalysis.html" class="github-link try-it">Try It Now</a>
+                        <a href="https://github.com/anthonyhuben/ColorHarmonyAnalysis" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>VideoGrid</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 1</span></div>
+                    </div>
+                    <p class="github-description">Create thumbnail grids from video files.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="VideoGrid.html" class="github-link try-it">Try It Now</a>
+                        <a href="https://github.com/anthonyhuben/VideoGrid" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>PasswordGenerator</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 1</span></div>
+                    </div>
+                    <p class="github-description">Generate strong passwords in the browser.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="PasswordGenerator.html" class="github-link try-it">Try It Now</a>
+                        <a href="https://github.com/anthonyhuben/PasswordGenerator" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12h6M9 16h6"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>VideoFileList</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 1</span></div>
+                    </div>
+                    <p class="github-description">Turn your video files into a clean list.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="https://github.com/anthonyhuben/VideoFileList" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+
+                <div class="github-card">
+                    <div class="github-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                    </div>
+                    <div class="github-header">
+                        <h3>ResumeBuilder</h3>
+                        <div class="github-meta"><span class="github-stars">⭐ 0</span></div>
+                    </div>
+                    <p class="github-description">Create a resume with a simple browser interface.</p>
+                    <p class="github-tech">HTML</p>
+                    <div class="github-links">
+                        <a href="https://github.com/anthonyhuben/ResumeBuilder" target="_blank" rel="noopener noreferrer" class="github-link">View on GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Anthony James Huben. All rights reserved.</p>
+            <div class="project-links" style="justify-content:center; margin-top: 16px;">
+                <a href="LockchestPrivacy.html" class="project-link">Lockchest Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
